@@ -6,7 +6,6 @@ import { Worksite, Employee, initialWorksites, initialEmployees } from '@/mocks/
 import { PlusCircle } from 'lucide-react';
 import { EmployeeSettingsModal } from '@/components/scheduling/EmployeeSettingsModal';
 import { AddButton } from '@/components/scheduling/AddButton';
-import { extractAreaFromName } from '@/lib/utils';
 import { toast } from 'sonner';
 /**
  * 工地排班主页面
@@ -44,12 +43,11 @@ export default function SchedulingPage() {
       
       const worksiteNames: string[] = await response.json();
       // 将工地名称转换为Worksite对象数组
-  const newWorksites: Worksite[] = worksiteNames.map((name, index) => ({
-    id: `w${Date.now()}-${index}`,
-    name,
-    scheduledEmployees: [],
-    area: extractAreaFromName(name) // 从名称提取面积
-  }));
+      const newWorksites: Worksite[] = worksiteNames.map((name, index) => ({
+        id: `w${Date.now()}-${index}`,
+        name,
+        scheduledEmployees: []
+      }));
       
       setWorksites(newWorksites);
       localStorage.setItem('worksites', JSON.stringify(newWorksites));
@@ -197,9 +195,8 @@ export default function SchedulingPage() {
   const addNewWorksite = () => {
      const newWorksite: Worksite = {
       id: `w${Date.now()}`,
-       name: `新工地${worksites.length + 1}`,
-       scheduledEmployees: [],
-       area: extractAreaFromName(`新工地${worksites.length + 1}`) // 从名称提取面积
+      name: `新工地${worksites.length + 1}`,
+      scheduledEmployees: []
     };
     
     setWorksites([...worksites, newWorksite]);
@@ -533,14 +530,7 @@ const closeNewEmployeeModal = () => {
                     <input
                       type="text"
                       value={selectedWorksite.name}
-                       onChange={(e) => {
-                         const newName = e.target.value;
-                         setSelectedWorksite(prev => prev ? {
-                           ...prev, 
-                           name: newName,
-                           area: extractAreaFromName(newName) // 从新名称提取面积
-                         } : null);
-                       }}
+                      onChange={(e) => setSelectedWorksite(prev => prev ? {...prev, name: e.target.value} : null)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>

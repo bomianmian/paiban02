@@ -28,12 +28,17 @@ export function WorksiteCard(
   const scheduledEmployees = worksite.scheduledEmployees.map(id => employees.find(emp => emp.id === id)).filter((emp): emp is Employee => !!emp);
   const [touchActive, setTouchActive] = useState(false);
   
-  // 计算已分配员工的总处理面积
-  const totalProcessingArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
-  // 计算进度百分比，添加安全检查防止除以零
-  const progressPercentage = worksite.area > 0 
-    ? Math.min(100, (totalProcessingArea / worksite.area) * 100) 
-    : 0;
+  // 面积计算
+  const maxArea = 80; // 工地面积固定为80平
+  const currentArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
+  const progressPercentage = (currentArea / maxArea) * 100;
+  
+  // 根据进度获取不同颜色
+  const getProgressColor = () => {
+    if (progressPercentage >= 100) return "bg-green-500";
+    if (progressPercentage > 0) return "bg-blue-500";
+    return "bg-gray-300";
+  };
 
   // 处理拖放区域检测
   const handleDragOver = (e: DragEvent | TouchEvent) => {
@@ -149,33 +154,34 @@ export function WorksiteCard(
     };
 
     return (
-     <div 
+    <div 
             ref={dropZoneRef}
-            className={cn(
-                "w-full rounded-xl shadow-md border border-gray-100 py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+      className={cn(
+        "relative",
+          "w-full h-[130px] bg-white rounded-xl shadow-md border border-gray-100 py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
                 isOver ? "border-blue-400 bg-blue-50 shadow-lg" : "border-gray-200 hover:border-blue-200"
             )}
-            style={{ 
-                background: `linear-gradient(to right, rgba(59, 130, 246, 0.15) ${progressPercentage}%, white ${progressPercentage}%)` 
-            }}
         >
-              {/* 工地标题和进度信息 */}
-              <div className="w-full mb-3">
-                  {/* 工地标题 - 居中显示 */}
-                  <div className="text-center mb-2">
-                      <div className="inline-flex items-center bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
-                          <Building2 size={14} className="text-blue-500 mr-1.5 flex-shrink-0" />
-                          <h3 className="font-medium text-gray-800 text-sm">{worksite.name}</h3>
-                      </div>
-                  </div>
-                  
-
-              </div>
+            {/* 进度条背景 */}
+            <div className="absolute inset-0 overflow-hidden rounded-xl">
+              <div 
+                className={`h-full transition-all duration-1000 ease-out ${getProgressColor()}`}
+                style={{ width: `${Math.min(100, progressPercentage)}%` }}
+              ></div>
+            </div>
+            
+            {/* 工地标题 - 居中显示 */}
+            <div className="text-center mb-3 w-full relative z-10">
+                <div className="inline-flex items-center bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
+                    <Building2 size={14} className="text-blue-500 mr-1.5 flex-shrink-0" />
+                    <h3 className="font-medium text-gray-800 text-sm">{worksite.name}</h3>
+                </div>
+            </div>
             
             {/* 员工卡片区域 - 位于标题下方 */}
-            <div className="flex items-center justify-center space-x-1 overflow-x-auto scrollbar-hide pb-2 w-full">
+             <div className="flex items-center justify-center space-x-1 overflow-x-hidden scrollbar-hide pb-2 w-full relative z-10">
                 {scheduledEmployees.length > 0 ? scheduledEmployees.map(
-                    employee => <div key={employee.id} className="bg-gray-50 p-1 rounded-lg min-w-[56px] flex-shrink-0">
+                    employee => <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-1 rounded-lg min-w-[56px] flex-shrink-0 border border-white/30">
                         <EmployeeCard
                             employee={employee}
                             onToggleLeave={toggleEmployeeLeave}
@@ -184,10 +190,12 @@ export function WorksiteCard(
                             showStatusButton={false}
                             onDoubleClick={() => removeEmployee(employee.id)} />
                     </div>
-                ) : <div className="text-center text-gray-400 text-sm whitespace-nowrap px-2">
+                ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">
                         未分配员工
                     </div>}
             </div>
+            
+
             
             {/* 右上角设置按钮 */}
             <button

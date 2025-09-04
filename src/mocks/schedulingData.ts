@@ -7,7 +7,6 @@ export interface Worksite {
   id: string;
   name: string;
   scheduledEmployees: Employee['id'][];
-  area: number; // 工地面积（平方米）
 }
 
 // 员工类型定义
@@ -21,16 +20,13 @@ export interface Employee {
 }
 
 // 初始工地数据
-import { extractAreaFromName } from '@/lib/utils';
-
 export const initialWorksites: Worksite[] = [
   {
     id: 'w1',
-    name: '城东工地80平',
-    scheduledEmployees: [],
-    area: extractAreaFromName('城东工地80平') // 从名称提取面积
+    name: '城东工地',
+    scheduledEmployees: []
   }
-]
+];
 
 // 初始员工数据 - 不包含默认数据
 export const initialEmployees: Employee[] = [];

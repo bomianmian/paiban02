@@ -11,4 +11,15 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+ }
+
+/* 隐藏所有滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* 针对IE、Edge和Firefox的滚动条隐藏 */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
