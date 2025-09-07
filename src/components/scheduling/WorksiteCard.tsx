@@ -28,8 +28,12 @@ export function WorksiteCard(
   const scheduledEmployees = worksite.scheduledEmployees.map(id => employees.find(emp => emp.id === id)).filter((emp): emp is Employee => !!emp);
   const [touchActive, setTouchActive] = useState(false);
   
-  // 面积计算
-  const maxArea = 80; // 工地面积固定为80平
+  // 从工地名称提取面积（"平"之前的数字）
+  const getMaxArea = (worksiteName: string) => {
+    const match = worksiteName.match(/(\d+)平/);
+    return match ? parseInt(match[1], 10) : 80;
+  };
+  const maxArea = getMaxArea(worksite.name);
   const currentArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
   const progressPercentage = (currentArea / maxArea) * 100;
   
