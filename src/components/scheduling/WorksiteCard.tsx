@@ -37,6 +37,10 @@ export function WorksiteCard(
   const currentArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
   const progressPercentage = (currentArea / maxArea) * 100;
   
+  // 计算预估工资：面积×3.6÷人数
+  const workerCount = scheduledEmployees.length;
+  const estimatedWage = workerCount > 0 ? (maxArea * 3.6 / workerCount).toFixed(2) : '0.00';
+  
   // 根据进度获取不同颜色
   const getProgressColor = () => {
     if (progressPercentage >= 100) return "bg-green-500";
@@ -174,12 +178,17 @@ export function WorksiteCard(
               ></div>
             </div>
             
-            {/* 工地标题 - 居中显示 */}
+             {/* 工地标题 - 居中显示 */}
             <div className="text-center mb-3 w-full relative z-10">
                 <div className="inline-flex items-center bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
                     <Building2 size={14} className="text-blue-500 mr-1.5 flex-shrink-0" />
-                    <h3 className="font-medium text-gray-800 text-sm">{worksite.name}</h3>
+             <h3 className="font-medium text-gray-800 text-sm">{worksite.name}</h3>
                 </div>
+            </div>
+            
+             {/* 右上角预估工资 - 调整位置避免与设置按钮重叠 */}
+             <div className="absolute top-2 right-[25px] bg-red-500/90 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+              ¥{estimatedWage}
             </div>
             
             {/* 员工卡片区域 - 位于标题下方 */}
@@ -204,7 +213,7 @@ export function WorksiteCard(
             {/* 右上角设置按钮 */}
             <button
                 onClick={() => onSettingsClick && onSettingsClick(worksite.id)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-blue-500 transition-colors p-2"
+                className="absolute top-[27px] right-2 text-gray-400 hover:text-blue-500 transition-colors p-2"
                 aria-label="工地设置">
                 <i className="fa-solid fa-cog"></i>
             </button>
