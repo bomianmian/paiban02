@@ -186,9 +186,9 @@ export function WorksiteCard(
                 </div>
             </div>
             
-             {/* 右上角预估工资 - 调整位置避免与设置按钮重叠 */}
-             <div className="absolute top-2 right-[25px] bg-red-500/90 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
-              ¥{estimatedWage}
+{/* 右上角预估工资 - 调整位置避免与设置按钮重叠 */}
+<div className="absolute top-2 right-[25px] bg-red-500/90 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm z-20">
+  ¥{estimatedWage}
             </div>
             
             {/* 员工卡片区域 - 位于标题下方 */}
