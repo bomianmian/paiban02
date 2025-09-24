@@ -1,4 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { format } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
+import CircularText from '@/components/CircularText';
 import { useNavigate } from 'react-router-dom';
 import { WorksiteList } from '@/components/scheduling/WorksiteList';
 import { EmployeeToolbar } from '@/components/scheduling/EmployeeToolbar';
@@ -15,16 +18,27 @@ export default function SchedulingPage() {
   const [worksites, setWorksites] = useState<Worksite[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [showScheduleInfo, setShowScheduleInfo] = useState(false);
+
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewEmployeeModalOpen, setIsNewEmployeeModalOpen] = useState(false);
   const [isEmployeeToolbarExpanded, setIsEmployeeToolbarExpanded] = useState(true);
+  const [isCircularTextVisible, setIsCircularTextVisible] = useState(true);
   // 工地设置模态框状态
   const [isWorksiteSettingsModalOpen, setIsWorksiteSettingsModalOpen] = useState(false);
   const [selectedWorksite, setSelectedWorksite] = useState<Worksite | null>(null);
+  // 日期状态管理 - 确保月份始终为当前系统月份
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  
+  // 确保初始日期在当前月份内
+  const initialDate = today.getMonth() === currentMonth ? today : firstDayOfMonth;
+  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   
   // 跟踪所有已分配的员工ID
   const assignedEmployeeIds = useMemo(() => {
@@ -34,6 +48,35 @@ export default function SchedulingPage() {
     });
     return ids;
   }, [worksites]);
+
+  // 日期格式化和调整方法
+  const formatDisplayDate = (date: Date): string => {
+    return format(date, 'M月d日', { locale: zhCN });
+  };
+
+  const incrementDate = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(newDate.getDate() + 1);
+      // 确保不超过当前月份的最后一天
+      if (newDate > lastDayOfMonth) {
+        return prev;
+      }
+      return newDate;
+    });
+  };
+
+  const decrementDate = () => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(newDate.getDate() - 1);
+      // 确保不早于当前月份的第一天
+      if (newDate < firstDayOfMonth) {
+        return prev;
+      }
+      return newDate;
+    });
+  };
   
   // API请求函数 - 获取工地信息
   const fetchWorksites = async () => {
@@ -329,8 +372,9 @@ const closeNewEmployeeModal = () => {
          }
          
          // 显示成功提示并展示排班信息
-         toast.success('排班数据已成功提交到飞书多维格');
-         setShowScheduleInfo(true);
+          toast.success('排班数据已成功提交到飞书多维格');
+          setIsCircularTextVisible(false);
+
        } catch (error) {
         console.error('提交排班数据失败:', error);
         toast.error('提交排班数据失败，请重试');
@@ -339,23 +383,10 @@ const closeNewEmployeeModal = () => {
     
      // 格式化排班信息为表格数据
      // 关闭排班信息表格
-     const closeScheduleInfo = () => {
-       setShowScheduleInfo(false);
-     };
+
      
      // 格式化排班信息为表格数据
-     const formatScheduleInfo = () => {
-      return worksites.map(worksite => {
-        const employeesInWorksite = worksite.scheduledEmployees
-          .map(id => employees.find(e => e.id === id))
-          .filter((emp): emp is Employee => !!emp);
-          
-        return {
-          worksiteName: worksite.name,
-          employees: employeesInWorksite
-        };
-      });
-    };
+
 
 
     
@@ -392,72 +423,70 @@ const closeNewEmployeeModal = () => {
     };
    
   return (
-     <div className="min-h-screen bg-gray-50 pt-16 pb-40">
+      <div className="min-h-screen pt-16 pb-40 relative" style={{ backgroundColor: '#abd1c6' }}>
+        {/* 圆形文字背景 - 成功提交后隐藏 */}
+        {isCircularTextVisible && (
+         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-10 pointer-events-none"><CircularText 
+             text="bomianmian" 
+             spinDuration={60} 
+             onHover="none" 
+             className="w-full h-full" 
+           />
+         </div>
+        )}
         {/* 左上角悬浮的完成按钮 */}
         <button
           onClick={handleComplete}
-          className="fixed top-4 left-4 w-12 h-12 p-3 shadow-lg bg-green-500 hover:bg-green-600 rounded-full z-30 flex items-center justify-center text-white"
+           className="fixed top-4 left-4 w-12 h-12 p-3 shadow-lg bg-[#f9bc60] hover:bg-[#e6ac50] rounded-full z-30 flex items-center justify-center text-white"
           aria-label="完成排班"
         >
           <i class="fa-solid fa-check"></i>
         </button>
 
         {/* 右上角悬浮的新增工地按钮 */}
-        <AddButton 
+         <AddButton 
           onClick={addNewWorksite} 
-          className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg bg-blue-500 hover:bg-blue-600 rounded-full z-30" 
+          className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg rounded-full z-30" 
         />
 
-        {/* 顶部导航栏 - 滚动时自动隐藏 */}
-        <header className={`fixed top-0 left-0 right-0 bg-white shadow-sm z-20 transition-transform duration-300 ease-in-out ${
-          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}>
-           <div className="flex justify-center items-center px-4 py-3">
-            <h1 className="text-xl font-bold text-gray-800">工地排班系统</h1>
-          </div>
-        </header>
+         {/* 顶部导航栏 - 滚动时自动隐藏 */}
+                <header className={`fixed top-0 left-0 right-0 bg-[#004643] shadow-sm z-20 transition-transform duration-300 ease-in-out ${
+             isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+           }`}>
+              <div className="flex items-center justify-center px-4 py-2">
+                <div className="flex items-center">
+                   <span className="text-lg font-medium text-[#fffffe]">{formatDisplayDate(currentDate)}</span>
+                  <span className="text-xl font-bold text-[#fffffe] ml-2">工地排班系统</span>
+                  <div className="flex flex-col ml-3">
+                    <button 
+                      onClick={decrementDate}
+                      className="p-1 text-gray-500 hover:text-gray-700"
+                      aria-label="减少日期"
+                    >
+                      <i className="fa-solid fa-chevron-up text-xs"></i>
+                    </button>
+                    <button 
+                      onClick={incrementDate}
+                      className="p-1 text-gray-500 hover:text-gray-700"
+                      aria-label="增加日期"
+                    >
+                      <i className="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+          </header>
        
-        {/* 排班信息表格显示区域 */}
-        {showScheduleInfo && (
-          <div className="fixed top-20 left-4 right-4 bg-white p-4 rounded-lg shadow-lg z-20 max-h-[50vh] overflow-y-auto">
-            <table className="min-w-full border border-gray-200 rounded-lg overflow-hidden">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="py-2 px-4 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">工地名称</th>
-                  <th className="py-2 px-4 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">员工</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {formatScheduleInfo().map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="py-2 px-4 border-b text-sm text-gray-900">{item.worksiteName}</td>
-                    <td className="py-2 px-4 border-b text-sm text-gray-500">
-                      {item.employees.length > 0 ? (
-                        item.employees.map(emp => emp.name).join(', ')
-                      ) : (
-                        <span className="text-gray-400 italic">未分配员工</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-             <button 
-               onClick={closeScheduleInfo}
-               className="mt-4 text-sm text-blue-500 hover:text-blue-700"
-             >
-               关闭
-            </button>
-          </div>
-        )}
+
        
        {/* 右上角悬浮的新增工地按钮 */}
-         <AddButton 
-           onClick={addNewWorksite} 
-           className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg bg-blue-500 hover:bg-blue-600 rounded-full z-30" 
-         />
+          <AddButton 
+            onClick={addNewWorksite} 
+            className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg rounded-full z-30" 
+          />
        
        {/* 工地列表区域 */}
+          <div className="pt-6 pb-4">
           <WorksiteList 
            worksites={worksites}
            employees={employees}
@@ -483,6 +512,7 @@ const closeNewEmployeeModal = () => {
             onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
 
          />
+          </div>
 
        {/* 员工信息设置模态框 */}
         {/* 编辑员工模态框 */}
@@ -512,48 +542,16 @@ const closeNewEmployeeModal = () => {
             >
               {/* 模态框头部 */}
               <div className="flex justify-between items-center p-4 border-b">
-                <h3 className="font-semibold text-lg text-gray-800">工地信息设置</h3>
-                <button 
-                  onClick={closeWorksiteSettingsModal}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <i class="fa-solid fa-times"></i>
-                </button>
+                <h3 className="font-semibold text-lg text-gray-700 mb-1">工地名称</h3>
+                <input
+                  type="text"
+                  value={selectedWorksite.name}
+                  onChange={(e) => setSelectedWorksite(prev => prev ? {...prev, name: e.target.value} : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
               </div>
               
-              {/* 模态框内容 */}
-              <div className="p-4">
-                <div className="space-y-4">
-                  {/* 工地名称输入 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">工地名称</label>
-                    <input
-                      type="text"
-                      value={selectedWorksite.name}
-                      onChange={(e) => setSelectedWorksite(prev => prev ? {...prev, name: e.target.value} : null)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    />
-                  </div>
-                  
-                  
-                </div>
-              </div>
               
-              {/* 模态框底部 */}
-              <div className="flex justify-end p-4 border-t">
-                <button
-                  onClick={closeWorksiteSettingsModal}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 mr-2 hover:bg-gray-50 transition-colors"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={() => selectedWorksite && updateWorksite(selectedWorksite)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  保存
-                </button>
-              </div>
             </div>
           )}
         </div>

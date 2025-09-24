@@ -50,11 +50,11 @@ export function EmployeeToolbar({
     onToggleExpand();
   };
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-10">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#004643] p-3 z-10">
       {/* 工具栏标题 */}
   <div className="flex justify-between items-center mb-3 px-2">
     <div className="flex items-center space-x-4">
-      <h2 className="text-lg font-semibold text-gray-800">员工列表</h2>
+      <h2 className="text-lg font-semibold text-white">员工列表</h2>
     </div>
     <div className="flex items-center space-x-2">
       {isExpanded && <AddButton onClick={onAddEmployee} className="w-8 h-8 p-2" />}
@@ -110,9 +110,9 @@ export function EmployeeToolbar({
       isExpanded ? 'max-h-4 opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0'
     }`}
   >
-    <div className="text-center text-xs text-gray-500">
-      拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
-    </div>
+     <div className="text-center text-xs" style={{ color: '#abd1c6' }}>
+  拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
+</div>
   </div>
     </div>
   );

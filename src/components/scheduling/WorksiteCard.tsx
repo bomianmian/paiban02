@@ -41,10 +41,10 @@ export function WorksiteCard(
   const workerCount = scheduledEmployees.length;
   const estimatedWage = workerCount > 0 ? (maxArea * 3.6 / workerCount).toFixed(2) : '0.00';
   
-  // 根据进度获取不同颜色
+  // 根据是否有员工获取不同颜色
   const getProgressColor = () => {
-    if (progressPercentage >= 100) return "bg-green-500";
-    if (progressPercentage > 0) return "bg-blue-500";
+    if (progressPercentage >= 100) return "bg-[#004643]";
+    if (worksite.scheduledEmployees.length > 0) return "bg-[#f9bc60]";
     return "bg-gray-300";
   };
 
@@ -164,14 +164,14 @@ export function WorksiteCard(
     return (
     <div 
             ref={dropZoneRef}
-      className={cn(
-        "relative",
-          "w-full h-[130px] bg-white rounded-xl shadow-md border border-gray-100 py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
-                isOver ? "border-blue-400 bg-blue-50 shadow-lg" : "border-gray-200 hover:border-blue-200"
+       className={cn(
+  "relative",
+   "w-full h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+      isOver ? "bg-blue-50 shadow-lg" : ""
             )}
         >
             {/* 进度条背景 */}
-            <div className="absolute inset-0 overflow-hidden rounded-xl">
+             <div className="absolute inset-0 overflow-hidden rounded-none">
               <div 
                 className={`h-full transition-all duration-1000 ease-out ${getProgressColor()}`}
                 style={{ width: `${Math.min(100, progressPercentage)}%` }}
@@ -180,14 +180,14 @@ export function WorksiteCard(
             
              {/* 工地标题 - 居中显示 */}
             <div className="text-center mb-3 w-full relative z-10">
-                <div className="inline-flex items-center bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-md shadow-sm border border-gray-100">
+                    <div className="inline-flex items-center backdrop-blur-sm px-3 py-1.5 rounded-none">
                     <Building2 size={14} className="text-blue-500 mr-1.5 flex-shrink-0" />
-             <h3 className="font-medium text-gray-800 text-sm">{worksite.name}</h3>
+              <h3 className={`font-medium text-sm ${progressPercentage >= 100 ? 'text-[#fffffe]' : 'text-gray-800'}`}>{worksite.name}</h3>
                 </div>
             </div>
             
-{/* 右上角预估工资 - 调整位置避免与设置按钮重叠 */}
-<div className="absolute top-2 right-[25px] bg-red-500/90 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm z-20">
+             {/* 右上角预估工资 - 调整位置避免与设置按钮重叠 */}
+<div className="absolute top-2 right-[25px] bg-[#e16162] text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm z-20">
   ¥{estimatedWage}
             </div>
             

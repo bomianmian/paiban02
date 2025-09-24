@@ -6,6 +6,8 @@ specifiers:
   '@vitejs/plugin-react': ^4.3.4
   autoprefixer: ^10.4.21
   clsx: ^2.1.1
+  date-fns: ^2.30.0
+  date-fns-tz: ^2.0.0
   framer-motion: ^12.9.2
   lucide-react: ^0.292.0
   postcss: ^8.5.3
@@ -23,6 +25,8 @@ specifiers:
 
 dependencies:
   clsx: 2.1.1
+  date-fns: 2.30.0
+  date-fns-tz: 2.0.1_date-fns@2.30.0
   framer-motion: 12.23.12_nnrd3gsncyragczmpvfhocinkq
   lucide-react: 0.292.0_react@18.3.1
   react: 18.3.1
@@ -1059,6 +1063,21 @@ packages:
   /d3-timer/3.0.1:
     resolution: {integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==}
     engines: {node: '>=12'}
+    dev: false
+
+  /date-fns-tz/2.0.1_date-fns@2.30.0:
+    resolution: {integrity: sha512-fJCG3Pwx8HUoLhkepdsP7Z5RsucUi+ZBOxyM5d0ZZ6c4SdYustq0VMmOu6Wf7bli+yS/Jwp91TOCqn9jMcVrUA==}
+    peerDependencies:
+      date-fns: 2.x
+    dependencies:
+      date-fns: 2.30.0
+    dev: false
+
+  /date-fns/2.30.0:
+    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
+    engines: {node: '>=0.11'}
+    dependencies:
+      '@babel/runtime': 7.28.3
     dev: false
 
   /debug/4.4.1:
