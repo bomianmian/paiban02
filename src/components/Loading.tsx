@@ -50,27 +50,27 @@ export function FullScreenLoading({
 }) {
   if (!isVisible) return null;
   
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="flex flex-col items-center">
-        <div className="loader-wrapper">
-          <div className="loader">
-            <div className="roller"></div>
-            <div className="roller"></div>
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4">
+        <div className="flex flex-col items-center w-full max-w-xs">
+          <div className="loader-wrapper mx-auto">
+            <div className="loader">
+              <div className="roller"></div>
+              <div className="roller"></div>
+            </div>
+            
+            <div id="loader2" className="loader">
+              <div className="roller"></div>
+              <div className="roller"></div>
+            </div>
+            
+            <div id="loader3" className="loader">
+              <div className="roller"></div>
+              <div className="roller"></div>
+            </div>
           </div>
-          
-          <div id="loader2" className="loader">
-            <div className="roller"></div>
-            <div className="roller"></div>
-          </div>
-          
-          <div id="loader3" className="loader">
-            <div className="roller"></div>
-            <div className="roller"></div>
-          </div>
+          <p className="text-white text-center mt-4 text-base sm:text-lg">{text}</p>
         </div>
-        <p className="text-white text-lg mt-6">{text}</p>
       </div>
-    </div>
-  );
+    );
 }

@@ -208,17 +208,17 @@ export function EmployeeCard({
       ref={cardRef}
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
-       className={cn(
-             "flex flex-col items-center justify-center p-3 rounded-none cursor-move min-w-[70px] sm:min-w-[80px] cursor-target",
-         "transition-all duration-200",
-            employee.isOnLeave 
-              ? "bg-[#abd1c6] opacity-60" 
-              : !isDraggable 
-                ? "bg-[#abd1c6] opacity-70" 
-                : "bg-[#abd1c6]",
-          isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-          onDoubleClick ? "cursor-pointer" : ""
-       )}
+        className={cn(
+              "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[50px] sm:min-w-[60px] cursor-target",
+          "transition-all duration-200",
+             employee.isOnLeave 
+               ? "bg-[#abd1c6] opacity-60" 
+               : !isDraggable 
+                 ? "bg-[#abd1c6] opacity-70 scale-90" 
+                 : "bg-[#abd1c6]",
+           isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+           onDoubleClick ? "cursor-pointer" : ""
+        )}
     >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}

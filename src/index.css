@@ -26,14 +26,16 @@
 
 /* 加载动画样式 */
 .loader-wrapper{
-  width:148px; 
-  height: 100px;  
+  width: 100%;
+  max-width: 148px;
+  height: 80px;  
   position: relative;
   margin: 0 auto;
 }
 .loader{
-  width:148px; 
-  height: 100px; 
+  width: 100%;
+  max-width: 148px;
+  height: 80px; 
   top: 0;
   left: 0;
   position: absolute;
@@ -57,8 +59,10 @@
 
 .roller,
 .roller:last-child{
-  width: 70px; 
-  height: 70px; 
+  width: 45%;
+  height: 45%; 
+  max-width: 70px;
+  max-height: 70px;
   position: absolute;
   top: 0;
   left: 0;
