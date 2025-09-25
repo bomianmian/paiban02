@@ -34,7 +34,7 @@ export function EmployeeCard({
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
   const [touchOffset, setTouchOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
-  const dragThreshold = 5; // 5px的移动阈值来区分点击和拖拽
+  const dragThreshold = window.innerWidth < 768 ? 10 : 5; // 移动设备使用更大的拖拽阈值(10px)来区分点击和拖拽
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   // 处理拖拽开始
@@ -55,11 +55,17 @@ export function EmployeeCard({
       // 触摸拖拽 - 记录初始位置
       const touch = e.touches[0];
       const rect = element.getBoundingClientRect();
+      // 存储相对于视口的位置，而不是元素
       setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
       setTouchOffset({ 
         x: touch.clientX - rect.left, 
         y: touch.clientY - rect.top 
       });
+      
+      // 添加明显的视觉反馈，表示拖拽开始
+      element.style.opacity = "0.8";
+      element.style.transform = "scale(1.1)";
+      element.style.zIndex = "1000";
       
       // 设置拖拽数据
       element.setAttribute('data-employee-id', employee.id);
@@ -95,13 +101,16 @@ export function EmployeeCard({
     const element = cardRef.current;
     
     // 计算移动距离
-    const dx = touch.clientX - touchStartPosition.x;
-    const dy = touch.clientY - touchStartPosition.y;
-    
-    // 如果是刚开始拖拽，检查是否超过拖拽阈值
-    if (Math.abs(dx) < dragThreshold && Math.abs(dy) < dragThreshold) {
-      return;
-    }
+      const dx = touch.clientX - touchStartPosition.x;
+      const dy = touch.clientY - touchStartPosition.y;
+      
+      // 如果是刚开始拖拽，检查是否超过拖拽阈值
+      if (Math.abs(dx) < dragThreshold && Math.abs(dy) < dragThreshold) {
+        return;
+      }
+      
+      // 防止触摸事件导致页面滚动
+      e.preventDefault();
     
     // 设置为固定定位，以便自由移动
     if (element.style.position !== 'fixed') {
@@ -114,8 +123,9 @@ export function EmployeeCard({
     }
     
     // 更新位置
-    element.style.left = `${touch.clientX - touchOffset.x}px`;
-    element.style.top = `${touch.clientY - touchOffset.y}px`;
+       // 使用clientX/clientY而不是pageX/pageY以确保在滚动页面上也能准确定位
+       element.style.left = `${touch.clientX - touchOffset.x}px`;
+       element.style.top = `${touch.clientY - touchOffset.y}px`;
     
     // 防止页面滚动
     e.preventDefault();

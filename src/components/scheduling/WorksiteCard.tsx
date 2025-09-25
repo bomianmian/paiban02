@@ -115,13 +115,15 @@ export function WorksiteCard(
     if (isTouchOver && !isOver) {
       setIsOver(true);
       // 添加视觉反馈类
-      dropZoneRef.current.classList.add('scale-[1.02]', 'shadow-md');
+      dropZoneRef.current.classList.add('scale-[1.05]', 'shadow-lg', 'bg-blue-50');
     } else if (!isTouchOver && isOver) {
       setIsOver(false);
       // 移除视觉反馈类
-      dropZoneRef.current.classList.remove('scale-[1.02]', 'shadow-md');
+      dropZoneRef.current.classList.remove('scale-[1.05]', 'shadow-lg', 'bg-blue-50');
     }
     
+    // 防止触摸事件导致页面滚动
+    e.preventDefault();
     setTouchActive(isTouchOver);
   };
 
