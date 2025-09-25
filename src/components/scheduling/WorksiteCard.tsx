@@ -33,7 +33,7 @@ export function WorksiteCard(
     const match = worksiteName.match(/(\d+)平/);
     return match ? parseInt(match[1], 10) : 80;
   };
-  const maxArea = getMaxArea(worksite.name);
+  const maxArea = getMaxArea(worksite.name || '');
   const currentArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
   const progressPercentage = (currentArea / maxArea) * 100;
   
@@ -115,15 +115,13 @@ export function WorksiteCard(
     if (isTouchOver && !isOver) {
       setIsOver(true);
       // 添加视觉反馈类
-      dropZoneRef.current.classList.add('scale-[1.05]', 'shadow-lg', 'bg-blue-50');
+      dropZoneRef.current.classList.add('scale-[1.02]', 'shadow-md');
     } else if (!isTouchOver && isOver) {
       setIsOver(false);
       // 移除视觉反馈类
-      dropZoneRef.current.classList.remove('scale-[1.05]', 'shadow-lg', 'bg-blue-50');
+      dropZoneRef.current.classList.remove('scale-[1.02]', 'shadow-md');
     }
     
-    // 防止触摸事件导致页面滚动
-    e.preventDefault();
     setTouchActive(isTouchOver);
   };
 
