@@ -174,7 +174,7 @@ export function WorksiteCard(
             ref={dropZoneRef}
        className={cn(
   "relative",
-   "w-full h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+    "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
       isOver ? "bg-blue-50 shadow-lg" : ""
             )}
         >

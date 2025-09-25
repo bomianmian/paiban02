@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import TargetCursor from "@/components/TargetCursor";
 import Home from "@/pages/Home";
 import SchedulingPage from "@/pages/SchedulingPage";
 import EmployeeEditPage from "@/pages/EmployeeEditPage";
@@ -16,6 +17,11 @@ export default function App() {
     <AuthContext.Provider
       value={{ isAuthenticated, setIsAuthenticated, logout }}
     >
+      <TargetCursor 
+        targetSelector=".cursor-target" 
+        spinDuration={2} 
+        hideDefaultCursor={true} 
+      />
       <Routes>
         <Route path="/" element={<Navigate to="/scheduling" replace />} />
         <Route path="/scheduling" element={<SchedulingPage />} />

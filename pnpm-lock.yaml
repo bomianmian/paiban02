@@ -9,6 +9,7 @@ specifiers:
   date-fns: ^2.30.0
   date-fns-tz: ^2.0.0
   framer-motion: ^12.9.2
+  gsap: ^3.12.5
   lucide-react: ^0.292.0
   postcss: ^8.5.3
   react: ^18.3.1
@@ -28,6 +29,7 @@ dependencies:
   date-fns: 2.30.0
   date-fns-tz: 2.0.1_date-fns@2.30.0
   framer-motion: 12.23.12_nnrd3gsncyragczmpvfhocinkq
+  gsap: 3.13.0
   lucide-react: 0.292.0_react@18.3.1
   react: 18.3.1
   react-dom: 18.3.1_react@18.3.1
@@ -1290,6 +1292,10 @@ packages:
   /globrex/0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
     dev: true
+
+  /gsap/3.13.0:
+    resolution: {integrity: sha512-QL7MJ2WMjm1PHWsoFrAQH/J8wUeqZvMtHO58qdekHpCfhvhSL4gSiz6vJf5EeMP0LOn3ZCprL2ki/gjED8ghVw==}
+    dev: false
 
   /hasown/2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}

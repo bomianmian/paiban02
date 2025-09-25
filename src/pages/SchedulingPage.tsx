@@ -14,6 +14,7 @@ import { toast } from 'sonner';
  * 工地排班主页面
  */
 import { Loading, FullScreenLoading } from '@/components/Loading';
+import ClickSpark from '@/components/ClickSpark';
 
 export default function SchedulingPage() {
   // 状态管理
@@ -441,8 +442,15 @@ const closeNewEmployeeModal = () => {
        fileInput.click();
      };
    
-  return (
-      <div className="min-h-screen pt-16 pb-40 relative" style={{ backgroundColor: '#abd1c6' }}>
+    return (
+        <ClickSpark
+          sparkColor='#fff'
+          sparkSize={10}
+          sparkRadius={15}
+          sparkCount={8}
+          duration={400}
+        >
+        <div className="min-h-screen pt-16 pb-40 relative px-2" style={{ backgroundColor: '#abd1c6' }}>
         {/* 圆形文字背景 - 成功提交后隐藏 */}
          {/* 加载状态覆盖层 */}
          <FullScreenLoading 
@@ -464,19 +472,19 @@ const closeNewEmployeeModal = () => {
          </div>
         )}
         {/* 左上角悬浮的完成按钮 */}
-        <button
+         <button
           onClick={handleComplete}
-           className="fixed top-4 left-4 w-12 h-12 p-3 shadow-lg bg-[#f9bc60] hover:bg-[#e6ac50] rounded-full z-30 flex items-center justify-center text-white"
+           className="fixed top-4 left-4 w-10 h-10 p-2 shadow-lg bg-[#f9bc60] hover:bg-[#e6ac50] rounded-full z-30 flex items-center justify-center text-white"
           aria-label="完成排班"
         >
           <i class="fa-solid fa-check"></i>
         </button>
 
         {/* 右上角悬浮的新增工地按钮 */}
-         <AddButton 
-          onClick={addNewWorksite} 
-          className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg rounded-full z-30" 
-        />
+            <AddButton 
+             onClick={addNewWorksite} 
+             className="fixed top-4 right-4 w-10 h-10 shadow-lg rounded-full z-30" 
+           />
 
          {/* 顶部导航栏 - 滚动时自动隐藏 */}
                 <header className={`fixed top-0 left-0 right-0 bg-[#004643] shadow-sm z-20 transition-transform duration-300 ease-in-out ${
@@ -509,9 +517,9 @@ const closeNewEmployeeModal = () => {
 
        
        {/* 右上角悬浮的新增工地按钮 */}
-          <AddButton 
+           <AddButton 
             onClick={addNewWorksite} 
-            className="fixed top-4 right-4 w-12 h-12 p-3 shadow-lg rounded-full z-30" 
+            className="fixed top-4 right-4 w-10 h-10 p-2 shadow-lg rounded-full z-30" 
           />
        
        {/* 工地列表区域 */}
@@ -605,6 +613,7 @@ const closeNewEmployeeModal = () => {
              </div>
            )}
          </div>
-      </div>
-   );
+       </div>
+        </ClickSpark>
+    );
 }

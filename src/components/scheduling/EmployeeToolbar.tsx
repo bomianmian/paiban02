@@ -57,7 +57,7 @@ export function EmployeeToolbar({
       <h2 className="text-lg font-semibold text-white">员工列表</h2>
     </div>
     <div className="flex items-center space-x-2">
-      {isExpanded && <AddButton onClick={onAddEmployee} className="w-8 h-8 p-2" />}
+        {isExpanded && <AddButton onClick={onAddEmployee} className="w-10 h-10" />}
       <button
         onClick={toggleExpand}
         className="flex items-center justify-center rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
@@ -76,7 +76,7 @@ export function EmployeeToolbar({
   >
      {/* 排序员工：未分配且未请假的员工排在前面，已分配或请假的排在后面 */}
      
-        <div className="flex space-x-2 px-2 overflow-x-hidden scrollbar-hide pb-2">
+         <div className="flex space-x-2 px-2 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-4">
           {filteredEmployees.length > 0 ? (
             filteredEmployees.map(employee => (
                <div key={employee.id} className="min-w-[80px]">

@@ -14,12 +14,12 @@ export function AddButton({ onClick, className }: AddButtonProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center rounded-full bg-[#f9bc60] text-white p-3 shadow-lg hover:bg-[#e6ac50] transition-all duration-200 active:scale-95",
+         "flex items-center justify-center rounded-full bg-[#f9bc60] text-white p-2 shadow-lg hover:bg-[#e6ac50] transition-all duration-200 active:scale-95",
         className
       )}
       aria-label="添加"
     >
-      <Plus size={24} />
+      <Plus size={18} />
     </button>
   );
 }
