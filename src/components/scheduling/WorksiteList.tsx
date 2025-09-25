@@ -55,7 +55,7 @@ export function WorksiteList({
       {/* 横向滚动的工地卡片列表 */}
       <div 
         ref={scrollContainerRef}
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 px-2 pb-3 max-w-full mx-auto"
+         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 px-2 pb-3 max-w-4xl mx-auto"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', overflow: 'hidden' }}
       >
         {worksites.map(worksite => (

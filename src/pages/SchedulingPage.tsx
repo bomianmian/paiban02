@@ -450,7 +450,7 @@ const closeNewEmployeeModal = () => {
           sparkCount={8}
           duration={400}
         >
-        <div className="min-h-screen pt-16 pb-32 sm:pb-40 relative px-2" style={{ backgroundColor: '#abd1c6' }}>
+         <div className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}>
         {/* 圆形文字背景 - 成功提交后隐藏 */}
          {/* 加载状态覆盖层 */}
          <FullScreenLoading 

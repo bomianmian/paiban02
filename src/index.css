@@ -26,16 +26,14 @@
 
 /* 加载动画样式 */
 .loader-wrapper{
-  width: 100%;
-  max-width: 148px;
-  height: 80px;  
+  width:148px; 
+  height: 100px;  
   position: relative;
   margin: 0 auto;
 }
 .loader{
-  width: 100%;
-  max-width: 148px;
-  height: 80px; 
+  width:148px; 
+  height: 100px; 
   top: 0;
   left: 0;
   position: absolute;
@@ -59,10 +57,8 @@
 
 .roller,
 .roller:last-child{
-  width: 45%;
-  height: 45%; 
-  max-width: 70px;
-  max-height: 70px;
+  width: 70px; 
+  height: 70px; 
   position: absolute;
   top: 0;
   left: 0;
@@ -186,5 +182,12 @@
   .roller{
     -webkit-animation-delay: 0.3s;
     animation-delay: 0.3s;
+  }
+}
+
+/* 移动端适配样式 */
+@media (max-width: 768px) {
+  .loader-wrapper, .target-cursor-wrapper {
+    display: none !important;
   }
 }

@@ -174,7 +174,7 @@ export function WorksiteCard(
             ref={dropZoneRef}
        className={cn(
   "relative",
-     "w-full h-auto min-h-[120px] sm:min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+    "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
       isOver ? "bg-blue-50 shadow-lg" : ""
             )}
         >
@@ -202,15 +202,17 @@ export function WorksiteCard(
             {/* 员工卡片区域 - 位于标题下方 */}
              <div className="flex items-center justify-center space-x-1 overflow-x-hidden scrollbar-hide pb-2 w-full relative z-10">
                 {scheduledEmployees.length > 0 ? scheduledEmployees.map(
-                    employee => <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-1 rounded-lg min-w-[56px] flex-shrink-0 border border-white/30">
-                        <EmployeeCard
-                            employee={employee}
-                            onToggleLeave={toggleEmployeeLeave}
-                            isDraggable={true}
-                            showSettingsButton={false}
-                            showStatusButton={false}
-                            onDoubleClick={() => removeEmployee(employee.id)} />
-                    </div>
+                     employee => (
+                        <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-1 rounded-lg min-w-[34px] flex-shrink-0 border border-white/30">
+                            <EmployeeCard
+                                employee={employee}
+                                onToggleLeave={toggleEmployeeLeave}
+                                isDraggable={true}
+                                showSettingsButton={false}
+                                showStatusButton={false}
+                                onDoubleClick={() => removeEmployee(employee.id)} />
+                        </div>
+                    )
                 ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">
                         未分配员工
                     </div>}

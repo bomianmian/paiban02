@@ -209,12 +209,12 @@ export function EmployeeCard({
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
         className={cn(
-              "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[50px] sm:min-w-[60px] cursor-target",
+            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
           "transition-all duration-200",
              employee.isOnLeave 
                ? "bg-[#abd1c6] opacity-60" 
                : !isDraggable 
-                 ? "bg-[#abd1c6] opacity-70 scale-90" 
+                 ? "bg-[#abd1c6] opacity-70" 
                  : "bg-[#abd1c6]",
            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
            onDoubleClick ? "cursor-pointer" : ""
