@@ -31,11 +31,11 @@ export function EmployeeCard({
   showStatusButton = true
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [isLongPressing, setIsLongPressing] = useState(false);
-  const [touchPosition, setTouchPosition] = useState<{ x: number, y: number } | null>(null);
+  const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
+  const [touchOffset, setTouchOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
-  const longPressTimer = useRef<number | null>(null);
-  const dragTimer = useRef<number | null>(null);
+  const dragThreshold = 5; // 5px的移动阈值来区分点击和拖拽
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   // 处理拖拽开始
   const handleDragStart = (e: DragEvent | TouchEvent) => {
@@ -43,15 +43,29 @@ export function EmployeeCard({
     
     const element = cardRef.current;
     setIsDragging(true);
-    element.classList.add('opacity-50', 'scale-95', 'shadow-lg');
-    element.style.zIndex = '100';
+    
+    // 添加拖拽视觉效果
+    element.classList.add('opacity-80', 'scale-105', 'shadow-lg', 'z-50');
     
     // 设置拖拽数据
     if ('dataTransfer' in e) {
+      // 鼠标拖拽
       (e as DragEvent).dataTransfer.setData('text/plain', employee.id);
-    } else {
-      // 对于触摸事件，存储在元素上
+    } else if ('touches' in e) {
+      // 触摸拖拽 - 记录初始位置
+      const touch = e.touches[0];
+      const rect = element.getBoundingClientRect();
+      setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
+      setTouchOffset({ 
+        x: touch.clientX - rect.left, 
+        y: touch.clientY - rect.top 
+      });
+      
+      // 设置拖拽数据
       element.setAttribute('data-employee-id', employee.id);
+      
+      // 防止触摸事件导致页面滚动
+      e.preventDefault();
     }
   };
 
@@ -61,23 +75,50 @@ export function EmployeeCard({
     
     const element = cardRef.current;
     setIsDragging(false);
-    setTouchPosition(null);
-    element.classList.remove('opacity-50', 'scale-95', 'shadow-lg');
-    element.style.zIndex = '';
+    setTouchStartPosition(null);
+    setTouchOffset({ x: 0, y: 0 });
+    
+    // 移除拖拽视觉效果
+    element.classList.remove('opacity-80', 'scale-105', 'shadow-lg', 'z-50');
     element.style.transform = '';
+    element.style.zIndex = '';
+    element.style.position = '';
+    element.style.left = '';
+    element.style.top = '';
   };
 
   // 处理触摸移动
   const handleTouchMove = (e: TouchEvent) => {
-    if (!isDragging || !touchPosition) return;
+    if (!isDragging || !touchStartPosition || !cardRef.current) return;
     
     const touch = e.touches[0];
-    const dx = touch.clientX - touchPosition.x;
-    const dy = touch.clientY - touchPosition.y;
+    const element = cardRef.current;
     
-    if (cardRef.current) {
-      cardRef.current.style.transform = `translate(${dx}px, ${dy}px)`;
+    // 计算移动距离
+    const dx = touch.clientX - touchStartPosition.x;
+    const dy = touch.clientY - touchStartPosition.y;
+    
+    // 如果是刚开始拖拽，检查是否超过拖拽阈值
+    if (Math.abs(dx) < dragThreshold && Math.abs(dy) < dragThreshold) {
+      return;
     }
+    
+    // 设置为固定定位，以便自由移动
+    if (element.style.position !== 'fixed') {
+      const rect = element.getBoundingClientRect();
+      element.style.position = 'fixed';
+      element.style.width = `${rect.width}px`;
+      element.style.height = `${rect.height}px`;
+      element.style.left = `${rect.left}px`;
+      element.style.top = `${rect.top}px`;
+    }
+    
+    // 更新位置
+    element.style.left = `${touch.clientX - touchOffset.x}px`;
+    element.style.top = `${touch.clientY - touchOffset.y}px`;
+    
+    // 防止页面滚动
+    e.preventDefault();
   };
 
   useEffect(() => {
@@ -90,72 +131,69 @@ export function EmployeeCard({
     element.addEventListener('dragend', handleDragEnd);
     
     // 触摸事件支持
-    element.addEventListener('touchstart', (e) => {
+    const handleTouchStart = (e: TouchEvent) => {
       // 记录初始触摸位置
-      setTouchPosition({
+      setTouchStartPosition({
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
       });
       
-      // 使用延迟来区分点击和拖拽
-      dragTimer.current = window.setTimeout(() => {
-        handleDragStart(e);
-      }, 200);
-    });
+      // 立即开始拖拽检测
+      handleDragStart(e);
+    };
     
-    element.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        e.preventDefault(); // 防止页面滚动
-        handleTouchMove(e);
-      }
-    });
-    
-    element.addEventListener('touchend', (e) => {
-      if (dragTimer.current) {
-        clearTimeout(dragTimer.current);
-        dragTimer.current = null;
-      }
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!isDragging) return;
       
-      if (isDragging) {
-        handleDragEnd();
-        
-        // 尝试找到触摸结束位置下的工地卡片
-        const touch = e.changedTouches[0];
-        const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-        const worksiteCard = dropTarget?.closest('.worksite-card');
-        
-        if (worksiteCard) {
-          const worksiteId = worksiteCard.getAttribute('data-worksite-id');
-          if (worksiteId) {
-            // 模拟拖放完成
-            const event = new CustomEvent('simulated-drop', {
-              detail: {
-                worksiteId,
-                employeeId: employee.id
-              },
-              bubbles: true
-            });
-            element.dispatchEvent(event);
-          }
+      handleDragEnd();
+      
+      // 尝试找到触摸结束位置下的工地卡片
+      const touch = e.changedTouches[0];
+      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+      const worksiteCard = dropTarget?.closest('.worksite-card');
+      
+      if (worksiteCard) {
+        const worksiteId = worksiteCard.getAttribute('data-worksite-id');
+        if (worksiteId) {
+          // 模拟拖放完成
+          const event = new CustomEvent('simulated-drop', {
+            detail: {
+              worksiteId,
+              employeeId: employee.id
+            },
+            bubbles: true
+          });
+          element.dispatchEvent(event);
         }
       }
-    });
+    };
     
-    element.addEventListener('touchcancel', handleDragEnd);
+    const handleTouchCancel = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        handleTouchMove(e);
+      }
+    };
+    
+    element.addEventListener('touchstart', handleTouchStart);
+    element.addEventListener('touchmove', handleTouchMove);
+    element.addEventListener('touchend', handleTouchEnd);
+    element.addEventListener('touchcancel', handleTouchCancel);
 
     return () => {
       element.removeEventListener('dragstart', handleDragStart as (e: DragEvent) => void);
       element.removeEventListener('dragend', handleDragEnd);
-      element.removeEventListener('touchstart', () => {});
-      element.removeEventListener('touchmove', () => {});
-      element.removeEventListener('touchend', () => {});
-      element.removeEventListener('touchcancel', handleDragEnd);
-      
-      if (dragTimer.current) {
-        clearTimeout(dragTimer.current);
-      }
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
+      element.removeEventListener('touchend', handleTouchEnd);
+      element.removeEventListener('touchcancel', handleTouchCancel);
     };
-  }, [employee.id, isDraggable, employee.isOnLeave]);
+  }, [employee.id, isDraggable, employee.isOnLeave, handleDragStart, handleDragEnd]);
 
   // 切换员工休假状态
   const toggleLeaveStatus = (e: React.MouseEvent) => {
@@ -179,8 +217,7 @@ export function EmployeeCard({
                 ? "bg-[#abd1c6] opacity-70" 
                 : "bg-[#abd1c6]",
           isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-         onDoubleClick ? "cursor-pointer" : "",
-         isLongPressing ? "scale-95 bg-blue-50" : ""
+          onDoubleClick ? "cursor-pointer" : ""
        )}
     >
          {/* 员工头像与姓名组合 */}

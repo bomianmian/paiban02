@@ -111,10 +111,15 @@ export function WorksiteCard(
       touch.clientY <= dropZone.bottom
     );
     
+    // 为触摸设备添加视觉反馈
     if (isTouchOver && !isOver) {
-      handleDragOver(e);
+      setIsOver(true);
+      // 添加视觉反馈类
+      dropZoneRef.current.classList.add('scale-[1.02]', 'shadow-md');
     } else if (!isTouchOver && isOver) {
-      handleDragLeave();
+      setIsOver(false);
+      // 移除视觉反馈类
+      dropZoneRef.current.classList.remove('scale-[1.02]', 'shadow-md');
     }
     
     setTouchActive(isTouchOver);
@@ -142,7 +147,7 @@ export function WorksiteCard(
     // 监听自定义的模拟拖放事件
     document.addEventListener('simulated-drop', handleDrop as (e: CustomEvent) => void);
 
-    return () => {
+     return () => {
       dropZone.removeEventListener("dragover", handleDragOver as (e: DragEvent) => void);
       dropZone.removeEventListener("dragleave", handleDragLeave);
       dropZone.removeEventListener("drop", handleDrop as (e: DragEvent) => void);
@@ -150,6 +155,9 @@ export function WorksiteCard(
       dropZone.removeEventListener("touchend", handleTouchEnd);
       dropZone.removeEventListener("touchcancel", handleTouchEnd);
       document.removeEventListener('simulated-drop', handleDrop as (e: CustomEvent) => void);
+      
+      // 清理视觉效果
+      dropZone.classList.remove('scale-[1.02]', 'shadow-md');
     };
   }, [worksite.id, worksite.scheduledEmployees, onAddEmployee]);
 
