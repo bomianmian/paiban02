@@ -84,13 +84,11 @@ export function EmployeeToolbar({
                    employee={employee}
                    onToggleLeave={onToggleLeave}
                    isDraggable={!employee.isOnLeave}
-                   onDoubleClick={() => {
-                     if (window.confirm(`确定要删除员工"${employee.name}"吗？`)) {
-                       onDeleteEmployee(employee.id);
-                     }
-                   }}
+                    onDoubleClick={() => {
+                      onSettingsClick && onSettingsClick(employee.id);
+                    }}
                     onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
-                     showSettingsButton={true}
+                      showSettingsButton={false}
                      showStatusButton={true}
                  />
               </div>

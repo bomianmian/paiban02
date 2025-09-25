@@ -210,10 +210,10 @@ export function WorksiteCard(
             
 
             
-            {/* 右上角设置按钮 */}
+            {/* 左下角设置按钮 */}
             <button
                 onClick={() => onSettingsClick && onSettingsClick(worksite.id)}
-                className="absolute top-[27px] right-2 text-gray-400 hover:text-blue-500 transition-colors p-2"
+                className="absolute bottom-2 left-2 text-gray-400 hover:text-blue-500 transition-colors p-2"
                 aria-label="工地设置">
                 <i className="fa-solid fa-cog"></i>
             </button>

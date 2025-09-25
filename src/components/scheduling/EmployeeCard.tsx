@@ -233,15 +233,7 @@ export function EmployeeCard({
         )}
         
            {/* 设置按钮 - 只在可拖拽状态下显示（未分配到工地的员工） */}
-            {showSettingsButton && (
-             <button
-               onClick={() => onSettingsClick && onSettingsClick(employee.id)}
-               className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
-               aria-label="设置"
-             >
-               <i class="fa-solid fa-cog"></i>
-             </button>
-           )}
+
         </div>
     </div>
   );

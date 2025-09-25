@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 /**
  * 工地排班主页面
  */
+import { Loading, FullScreenLoading } from '@/components/Loading';
+
 export default function SchedulingPage() {
   // 状态管理
   const [worksites, setWorksites] = useState<Worksite[]>([]);
@@ -26,6 +28,10 @@ export default function SchedulingPage() {
   const [isNewEmployeeModalOpen, setIsNewEmployeeModalOpen] = useState(false);
   const [isEmployeeToolbarExpanded, setIsEmployeeToolbarExpanded] = useState(true);
   const [isCircularTextVisible, setIsCircularTextVisible] = useState(true);
+  // 加载状态管理
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   // 工地设置模态框状态
   const [isWorksiteSettingsModalOpen, setIsWorksiteSettingsModalOpen] = useState(false);
   const [selectedWorksite, setSelectedWorksite] = useState<Worksite | null>(null);
@@ -132,25 +138,32 @@ export default function SchedulingPage() {
   // 从API获取数据或使用本地存储以及处理滚动事件
   useEffect(() => {
     const loadData = async () => {
-      // 先尝试从API获取数据
-      const [worksitesFromApi, employeesFromApi] = await Promise.all([
-        fetchWorksites(),
-        fetchEmployees()
-      ]);
-      
-      // 如果API获取失败，尝试从本地存储加载
-      if (worksitesFromApi.length === 0) {
-        const savedWorksites = localStorage.getItem('worksites');
-        if (savedWorksites) {
-          setWorksites(JSON.parse(savedWorksites));
+      setIsLoadingData(true);
+      try {
+        // 先尝试从API获取数据
+        const [worksitesFromApi, employeesFromApi] = await Promise.all([
+          fetchWorksites(),
+          fetchEmployees()
+        ]);
+        
+        // 如果API获取失败，尝试从本地存储加载
+        if (worksitesFromApi.length === 0) {
+          const savedWorksites = localStorage.getItem('worksites');
+          if (savedWorksites) {
+            setWorksites(JSON.parse(savedWorksites));
+          }
         }
-      }
-      
-      if (employeesFromApi.length === 0) {
-        const savedEmployees = localStorage.getItem('employees');
-        if (savedEmployees) {
-          setEmployees(JSON.parse(savedEmployees));
+        
+        if (employeesFromApi.length === 0) {
+          const savedEmployees = localStorage.getItem('employees');
+          if (savedEmployees) {
+            setEmployees(JSON.parse(savedEmployees));
+          }
         }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoadingData(false);
       }
     };
     
@@ -338,48 +351,51 @@ const closeNewEmployeeModal = () => {
     };
 
       // 处理完成按钮点击，提交排班数据到飞书多维格
-     const handleComplete = async () => {
-       try {
-         // 格式化排班数据为API要求的格式
-         const assignments = worksites.map(worksite => {
-           const employeesInWorksite = worksite.scheduledEmployees
-             .map(id => employees.find(e => e.id === id))
-             .filter((emp): emp is Employee => !!emp);
-             
-           const employeeNames = employeesInWorksite.length > 0 
-             ? employeesInWorksite.map(emp => emp.name).join(', ')
-             : '未分配员工';
-             
-           return `${worksite.name}\t${employeeNames}`;
-         });
-         
-         // 发送POST请求到API
-          const response = await fetch('https://bomianmian8n.dpdns.org/', {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-           },
-           body: JSON.stringify({ assignments }),
-         });
-         
-         // 获取响应内容
-         const responseData = await response.json();
-         
-         // 检查响应状态和数据
-         if (!response.ok || !responseData.success) {
-           const errorMessage = responseData.message || `提交失败，状态码: ${response.status}`;
-           throw new Error(errorMessage);
-         }
-         
-         // 显示成功提示并展示排班信息
-          toast.success('排班数据已成功提交到飞书多维格');
-          setIsCircularTextVisible(false);
+      const handleComplete = async () => {
+        setIsSubmitting(true);
+        try {
+          // 格式化排班数据为API要求的格式
+          const assignments = worksites.map(worksite => {
+            const employeesInWorksite = worksite.scheduledEmployees
+              .map(id => employees.find(e => e.id === id))
+              .filter((emp): emp is Employee => !!emp);
+              
+            const employeeNames = employeesInWorksite.length > 0 
+              ? employeesInWorksite.map(emp => emp.name).join(', ')
+              : '未分配员工';
+              
+            return `${worksite.name}\t${employeeNames}`;
+          });
+          
+          // 发送POST请求到API
+           const response = await fetch('https://bomianmian8n.dpdns.org/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ assignments }),
+          });
+          
+          // 获取响应内容
+          const responseData = await response.json();
+          
+          // 检查响应状态和数据
+          if (!response.ok || !responseData.success) {
+            const errorMessage = responseData.message || `提交失败，状态码: ${response.status}`;
+            throw new Error(errorMessage);
+          }
+          
+          // 显示成功提示并展示排班信息
+           toast.success('排班数据已成功提交到飞书多维格');
+           setIsCircularTextVisible(false);
 
-       } catch (error) {
-        console.error('提交排班数据失败:', error);
-        toast.error('提交排班数据失败，请重试');
-      }
-    };
+        } catch (error) {
+         console.error('提交排班数据失败:', error);
+         toast.error('提交排班数据失败，请重试');
+       } finally {
+         setIsSubmitting(false);
+       }
+     };
     
      // 格式化排班信息为表格数据
      // 关闭排班信息表格
@@ -391,41 +407,54 @@ const closeNewEmployeeModal = () => {
 
     
     // 导入员工数据
-    const handleImport = () => {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = '.json';
-      
-      fileInput.onchange = (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const importedEmployees = JSON.parse(event.target?.result as string);
-            if (Array.isArray(importedEmployees)) {
-              setEmployees(importedEmployees);
-              localStorage.setItem('employees', JSON.stringify(importedEmployees));
-              toast.success('员工数据导入成功');
-            } else {
-              toast.error('导入失败：无效的员工数据格式');
-            }
-          } catch (error) {
-            toast.error('导入失败：文件解析错误');
-            console.error('Error parsing imported employees:', error);
-          }
-        };
-        reader.readAsText(file);
-      };
-      
-      fileInput.click();
-    };
+     const handleImport = () => {
+       const fileInput = document.createElement('input');
+       fileInput.type = 'file';
+       fileInput.accept = '.json';
+       
+       fileInput.onchange = (e) => {
+         const file = (e.target as HTMLInputElement).files?.[0];
+         if (!file) return;
+         
+         setIsImporting(true);
+         const reader = new FileReader();
+         reader.onload = (event) => {
+           try {
+             const importedEmployees = JSON.parse(event.target?.result as string);
+             if (Array.isArray(importedEmployees)) {
+               setEmployees(importedEmployees);
+               localStorage.setItem('employees', JSON.stringify(importedEmployees));
+               toast.success('员工数据导入成功');
+             } else {
+               toast.error('导入失败：无效的员工数据格式');
+             }
+           } catch (error) {
+             toast.error('导入失败：文件解析错误');
+             console.error('Error parsing imported employees:', error);
+           } finally {
+             setIsImporting(false);
+           }
+         };
+         reader.readAsText(file);
+       };
+       
+       fileInput.click();
+     };
    
   return (
       <div className="min-h-screen pt-16 pb-40 relative" style={{ backgroundColor: '#abd1c6' }}>
         {/* 圆形文字背景 - 成功提交后隐藏 */}
-        {isCircularTextVisible && (
+         {/* 加载状态覆盖层 */}
+         <FullScreenLoading 
+           isVisible={isLoadingData || isSubmitting || isImporting} 
+           text={
+             isLoadingData ? "加载数据中..." : 
+             isSubmitting ? "提交排班数据中..." : 
+             "导入员工数据中..."
+           } 
+         />
+         
+         {isCircularTextVisible && (
          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-10 pointer-events-none"><CircularText 
              text="bomianmian" 
              spinDuration={60} 
@@ -533,28 +562,49 @@ const closeNewEmployeeModal = () => {
           isNewEmployee={true}
         />
         
-        {/* 工地设置模态框 */}
-         <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 ${isWorksiteSettingsModalOpen ? 'block' : 'hidden'}`}>
-          {selectedWorksite && (
-            <div 
-              className="bg-white rounded-xl shadow-lg w-full max-w-md transform transition-all duration-300 scale-100"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* 模态框头部 */}
-              <div className="flex justify-between items-center p-4 border-b">
-                <h3 className="font-semibold text-lg text-gray-700 mb-1">工地名称</h3>
-                <input
-                  type="text"
-                  value={selectedWorksite.name}
-                  onChange={(e) => setSelectedWorksite(prev => prev ? {...prev, name: e.target.value} : null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              </div>
-              
-              
-            </div>
-          )}
-        </div>
+         {/* 工地设置模态框 */}
+          <div className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 transition-opacity duration-300 ${isWorksiteSettingsModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+           {selectedWorksite && (
+             <div 
+               className="bg-white rounded-xl shadow-lg w-full max-w-md transform transition-all duration-300 scale-100"
+               onClick={(e) => e.stopPropagation()}
+             >
+               {/* 模态框头部 */}
+               <div className="flex justify-between items-center p-4 border-b">
+                 <h3 className="font-semibold text-lg text-gray-700 mb-1">工地名称</h3>
+               </div>
+               
+               <div className="p-4">
+                 <input
+                   type="text"
+                   value={selectedWorksite.name}
+                   onChange={(e) => setSelectedWorksite(prev => prev ? {...prev, name: e.target.value} : null)}
+                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                 />
+               </div>
+               
+               {/* 模态框底部 */}
+               <div className="flex justify-end p-4 border-t">
+                 <button
+                   onClick={closeWorksiteSettingsModal}
+                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 mr-2 hover:bg-gray-50 transition-colors"
+                 >
+                   取消
+                 </button>
+                 <button
+                   onClick={() => {
+                     if (selectedWorksite) {
+                       updateWorksite(selectedWorksite);
+                     }
+                   }}
+                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                 >
+                   保存
+                 </button>
+               </div>
+             </div>
+           )}
+         </div>
       </div>
    );
 }
