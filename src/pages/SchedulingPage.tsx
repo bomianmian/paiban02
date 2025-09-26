@@ -235,8 +235,9 @@ export default function SchedulingPage() {
         );
         
         // 如果是已分配的员工，显示提示
-         if (assignedEmployeeIds.has(employeeId)) {
-         }
+        if (assignedEmployeeIds.has(employeeId)) {
+          toast.info("已选择员工，请点击目标工地完成分配");
+        }
       }
    };
    
