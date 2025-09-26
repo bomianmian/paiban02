@@ -60,7 +60,7 @@ export function EmployeeCard({
       const touch = e.touches[0];
       const rect = element.getBoundingClientRect();
       setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
-      setTouchOffset({ 
+       setTouchOffset({ 
         x: touch.clientX - rect.left, 
         y: touch.clientY - rect.top 
       });
@@ -68,8 +68,16 @@ export function EmployeeCard({
       // 设置拖拽数据
       element.setAttribute('data-employee-id', employee.id);
       
-      // 防止触摸事件导致页面滚动
-      e.preventDefault();
+      // 计算触摸移动距离
+      const currentTouch = e.touches[0];
+      const dx = currentTouch.clientX - touchStartPosition.x;
+      const dy = currentTouch.clientY - touchStartPosition.y;
+      
+      // 仅在实际拖拽时才阻止默认行为
+      if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) {
+        // 防止触摸事件导致页面滚动
+        e.preventDefault();
+      }
     }
   };
 
@@ -213,7 +221,7 @@ export function EmployeeCard({
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
         className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target touch-manipulation",
+            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
           "transition-all duration-200",
              employee.isOnLeave 
                ? "bg-[#abd1c6] opacity-60" 
