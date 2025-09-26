@@ -4,7 +4,7 @@ import { Worksite, Employee } from "@/mocks/schedulingData";
 import { Building2, X } from "lucide-react";
 import { EmployeeCard } from "./EmployeeCard";
 
-    interface WorksiteCardProps {
+     interface WorksiteCardProps {
   worksite: Worksite;
   employees: Employee[];
   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
@@ -14,6 +14,9 @@ import { EmployeeCard } from "./EmployeeCard";
   onClick?: () => void;
   isEmployeeSelected?: (id: string) => boolean;
   onEmployeeSelect?: (id: string) => void;
+  isMobile?: boolean;
+  selectedEmployeeId?: string | null;
+  setSelectedEmployeeId?: (id: string | null) => void;
 }
 
 export function WorksiteCard(
@@ -26,7 +29,10 @@ export function WorksiteCard(
         onSettingsClick,
         onClick,
         isEmployeeSelected,
-        onEmployeeSelect
+  onEmployeeSelect,
+  isMobile,
+  selectedEmployeeId,
+  setSelectedEmployeeId
     }: WorksiteCardProps
 ) {
     const [isOver, setIsOver] = useState(false);
@@ -183,7 +189,16 @@ export function WorksiteCard(
      "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
        isOver ? "bg-blue-50 shadow-lg" : ""
               )}
-           onClick={onClick}
+             onClick={(e) => {
+                // 如果有选中的员工且在移动设备上，先处理员工分配
+                if (isMobile && selectedEmployeeId && setSelectedEmployeeId) {
+                  e.stopPropagation();
+                  onAddEmployee(worksite.id, selectedEmployeeId);
+                  setSelectedEmployeeId(null);
+                } else if (onClick) {
+                  onClick();
+                }
+             }}
          >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">

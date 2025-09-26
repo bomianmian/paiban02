@@ -4,7 +4,7 @@ import { Worksite, Employee } from '@/mocks/schedulingData';
 import { WorksiteCard } from './WorksiteCard';
 import { AddButton } from './AddButton';
 
-     interface WorksiteListProps {
+      interface WorksiteListProps {
   worksites: Worksite[];
   employees: Employee[];
   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
@@ -15,6 +15,9 @@ import { AddButton } from './AddButton';
   onWorksiteClick?: (worksiteId: string) => void;
   isEmployeeSelected?: (id: string) => boolean;
   onEmployeeSelect?: (id: string) => void;
+  isMobile?: boolean;
+  selectedEmployeeId?: string | null;
+  setSelectedEmployeeId?: (id: string | null) => void;
 }
 
 /**
@@ -30,6 +33,9 @@ export function WorksiteList({
   onWorksiteSettings,
   onWorksiteClick,
   isEmployeeSelected,
+  isMobile,
+  selectedEmployeeId,
+  setSelectedEmployeeId,
   onEmployeeSelect
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -69,17 +75,20 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-                <WorksiteCard 
-                  worksite={worksite}
-                  employees={employees}
-                  onRemoveEmployee={onRemoveEmployee}
-                  onAddEmployee={onAddEmployee}
-                  onDeleteWorksite={onDeleteWorksite}
-                  onSettingsClick={onWorksiteSettings}
-                  onClick={() => onWorksiteClick?.(worksite.id)}
-                  isEmployeeSelected={isEmployeeSelected}
-                  onEmployeeSelect={onEmployeeSelect}
-                 />
+                 <WorksiteCard 
+                   worksite={worksite}
+                   employees={employees}
+                   onRemoveEmployee={onRemoveEmployee}
+                   onAddEmployee={onAddEmployee}
+                   onDeleteWorksite={onDeleteWorksite}
+                   onSettingsClick={onWorksiteSettings}
+                   onClick={() => onWorksiteClick?.(worksite.id)}
+                   isEmployeeSelected={isEmployeeSelected}
+                   onEmployeeSelect={onEmployeeSelect}
+                   isMobile={isMobile}
+                   selectedEmployeeId={selectedEmployeeId}
+                   setSelectedEmployeeId={setSelectedEmployeeId}
+                  />
           </div>
         ))}
       </div>

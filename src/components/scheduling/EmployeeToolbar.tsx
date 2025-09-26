@@ -80,7 +80,10 @@ export function EmployeeToolbar({
   >
      {/* 排序员工：未分配且未请假的员工排在前面，已分配或请假的排在后面 */}
      
-          <div className="flex flex-nowrap space-x-2 px-2 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-4">
+           <div 
+  className="flex flex-nowrap space-x-2 px-2 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-4"
+  style={isMobile ? { WebkitOverflowScrolling: 'touch' } : {}}
+>
           {filteredEmployees.length > 0 ? (
             filteredEmployees.map(employee => (
                <div key={employee.id} className="min-w-[80px]">

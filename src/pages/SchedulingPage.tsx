@@ -228,11 +228,16 @@ export default function SchedulingPage() {
    // 处理员工选择
    const handleEmployeeSelect = (employeeId: string) => {
      // 如果是移动端且不是拖拽状态
-     if (isMobile) {
-       setSelectedEmployeeId(prev => 
-         prev === employeeId ? null : employeeId
-       );
-     }
+      if (isMobile) {
+        // 无论员工是否已分配，都允许选择
+        setSelectedEmployeeId(prev => 
+          prev === employeeId ? null : employeeId
+        );
+        
+        // 如果是已分配的员工，显示提示
+         if (assignedEmployeeIds.has(employeeId)) {
+         }
+      }
    };
    
    // 检查员工是否被选中
@@ -565,21 +570,24 @@ const closeNewEmployeeModal = () => {
        
        {/* 工地列表区域 */}
           <div className="pt-6 pb-4">
-         <WorksiteList 
-          worksites={worksites}
-          employees={employees}
-          onRemoveEmployee={removeEmployeeFromWorksite}
-          onAddEmployee={addEmployeeToWorksite}
-          onWorksiteClick={handleWorksiteClick}
-          onAddWorksite={addNewWorksite}
-          onDeleteWorksite={deleteWorksite}
-           onWorksiteSettings={(id) => {
-             const worksite = worksites.find(w => w.id === id);
-             if (worksite) openWorksiteSettingsModal(worksite);
-           }}
-          isEmployeeSelected={isEmployeeSelected}
-          onEmployeeSelect={handleEmployeeSelect}
-        />
+          <WorksiteList 
+           worksites={worksites}
+           employees={employees}
+           onRemoveEmployee={removeEmployeeFromWorksite}
+           onAddEmployee={addEmployeeToWorksite}
+           onWorksiteClick={handleWorksiteClick}
+           onAddWorksite={addNewWorksite}
+           onDeleteWorksite={deleteWorksite}
+            onWorksiteSettings={(id) => {
+              const worksite = worksites.find(w => w.id === id);
+              if (worksite) openWorksiteSettingsModal(worksite);
+            }}
+           isEmployeeSelected={isEmployeeSelected}
+           onEmployeeSelect={handleEmployeeSelect}
+           isMobile={isMobile}
+           selectedEmployeeId={selectedEmployeeId}
+           setSelectedEmployeeId={setSelectedEmployeeId}
+         />
        
        {/* 底部员工工具栏 */}
           <EmployeeToolbar 
