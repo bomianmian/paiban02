@@ -232,7 +232,8 @@ export function EmployeeCard({
             onDoubleClick ? "cursor-pointer" : "",
             selectedWorksiteId ? "cursor-pointer hover:scale-105" : ""
          )}
-        onClick={() => {
+      onClick={(e) => {
+          e.stopPropagation(); // 防止事件冒泡到工地卡片
           if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
             onAssign(employee.id);
           }
