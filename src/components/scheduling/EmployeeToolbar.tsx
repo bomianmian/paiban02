@@ -64,7 +64,7 @@ export function EmployeeToolbar({
         {isExpanded && <AddButton onClick={onAddEmployee} className="w-10 h-10" />}
       <button
         onClick={toggleExpand}
-        className="flex items-center justify-center rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors w-10 h-10"
+        className="flex items-center justify-center rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
         aria-label={isExpanded ? "收起员工列表" : "展开员工列表"}
       >
         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -73,17 +73,14 @@ export function EmployeeToolbar({
   </div>
       
   {/* 员工卡片横向滚动列表 - 带折叠功能 */}
-   <div 
+  <div 
     className={`transition-all duration-300 ease-in-out overflow-hidden ${
-      isExpanded ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+      isExpanded ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
     }`}
   >
      {/* 排序员工：未分配且未请假的员工排在前面，已分配或请假的排在后面 */}
      
-           <div 
-  className="flex flex-nowrap space-x-2 px-2 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-4"
-  style={isMobile ? { WebkitOverflowScrolling: 'touch' } : {}}
->
+         <div className="flex space-x-2 px-2 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-4">
           {filteredEmployees.length > 0 ? (
             filteredEmployees.map(employee => (
                <div key={employee.id} className="min-w-[80px]">
@@ -116,12 +113,10 @@ export function EmployeeToolbar({
     className={`transition-all duration-300 ease-in-out overflow-hidden ${
       isExpanded ? 'max-h-4 opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0'
     }`}
-   >
-     {!isMobile && (
-       <div className="text-center text-xs" style={{ color: '#abd1c6' }}>
-         拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
-       </div>
-     )}
+  >
+     <div className="text-center text-xs" style={{ color: '#abd1c6' }}>
+  拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
+</div>
   </div>
     </div>
   );

@@ -225,10 +225,7 @@ export function EmployeeCard({
    return (
      <div
        ref={cardRef}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect && onSelect();
-        }}
+       onClick={() => onSelect && onSelect()}
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
         className={cn(
@@ -240,7 +237,7 @@ export function EmployeeCard({
                : "bg-[#abd1c6]",
            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
            onDoubleClick ? "cursor-pointer" : "",
-            isSelected ? "transform scale-110 shadow-lg ring-2 ring-blue-500 z-10" : "",
+           isSelected ? "transform rotate-20 scale-110 shadow-lg ring-2 ring-blue-500" : "",
            isSelected && employee.isOnLeave ? "opacity-80" : ""
          )}
     >

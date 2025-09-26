@@ -4,20 +4,15 @@ import { Worksite, Employee } from '@/mocks/schedulingData';
 import { WorksiteCard } from './WorksiteCard';
 import { AddButton } from './AddButton';
 
-      interface WorksiteListProps {
-  worksites: Worksite[];
-  employees: Employee[];
-  onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
-  onAddEmployee: (worksiteId: string, employeeId: string) => void;
-  onAddWorksite: () => void;
-  onDeleteWorksite: (worksiteId: string) => void;
-  onWorksiteSettings?: (worksiteId: string) => void;
-  onWorksiteClick?: (worksiteId: string) => void;
-  isEmployeeSelected?: (id: string) => boolean;
-  onEmployeeSelect?: (id: string) => void;
-  isMobile?: boolean;
-  selectedEmployeeId?: string | null;
-  setSelectedEmployeeId?: (id: string | null) => void;
+   interface WorksiteListProps {
+   worksites: Worksite[];
+   employees: Employee[];
+   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
+   onAddEmployee: (worksiteId: string, employeeId: string) => void;
+   onAddWorksite: () => void;
+   onDeleteWorksite: (worksiteId: string) => void;
+   onWorksiteSettings?: (worksiteId: string) => void;
+   onWorksiteClick?: (worksiteId: string) => void;
 }
 
 /**
@@ -31,12 +26,7 @@ export function WorksiteList({
   onAddWorksite,
   onDeleteWorksite,
   onWorksiteSettings,
-  onWorksiteClick,
-  isEmployeeSelected,
-  isMobile,
-  selectedEmployeeId,
-  setSelectedEmployeeId,
-  onEmployeeSelect
+  onWorksiteClick
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -75,20 +65,15 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-                 <WorksiteCard 
-                   worksite={worksite}
-                   employees={employees}
-                   onRemoveEmployee={onRemoveEmployee}
-                   onAddEmployee={onAddEmployee}
-                   onDeleteWorksite={onDeleteWorksite}
-                   onSettingsClick={onWorksiteSettings}
-                   onClick={() => onWorksiteClick?.(worksite.id)}
-                   isEmployeeSelected={isEmployeeSelected}
-                   onEmployeeSelect={onEmployeeSelect}
-                   isMobile={isMobile}
-                   selectedEmployeeId={selectedEmployeeId}
-                   setSelectedEmployeeId={setSelectedEmployeeId}
-                  />
+               <WorksiteCard 
+                 worksite={worksite}
+                 employees={employees}
+                 onRemoveEmployee={onRemoveEmployee}
+                 onAddEmployee={onAddEmployee}
+                 onDeleteWorksite={onDeleteWorksite}
+                  onSettingsClick={onWorksiteSettings}
+                  onClick={() => onWorksiteClick?.(worksite.id)}
+                />
           </div>
         ))}
       </div>
