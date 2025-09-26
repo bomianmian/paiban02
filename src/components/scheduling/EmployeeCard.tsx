@@ -8,15 +8,17 @@ import { User } from 'lucide-react';
 /**
  * 员工卡片组件 - 显示员工信息，支持拖拽和休假状态切换
  */
-interface EmployeeCardProps {
-  employee: Employee;
-  onToggleLeave: (id: string) => void;
-  isDraggable?: boolean;
-  onDoubleClick?: () => void;
-  onSettingsClick?: (id: string) => void;
-  showSettingsButton?: boolean;
-  showStatusButton?: boolean;
-}
+  interface EmployeeCardProps {
+    employee: Employee;
+    onToggleLeave: (id: string) => void;
+    isDraggable?: boolean;
+    onDoubleClick?: () => void;
+    onSettingsClick?: (id: string) => void;
+    showSettingsButton?: boolean;
+    showStatusButton?: boolean;
+    isSelected?: boolean;
+    onSelect?: () => void;
+  }
 
 /**
  * 员工卡片组件 - 显示员工信息，支持拖拽、双击删除和长按设置
@@ -28,7 +30,9 @@ export function EmployeeCard({
   onDoubleClick,
   onSettingsClick,
   showSettingsButton = true,
-  showStatusButton = true
+  showStatusButton = true,
+  isSelected,
+  onSelect
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
@@ -184,7 +188,6 @@ export function EmployeeCard({
     element.addEventListener('touchmove', handleTouchMove);
     element.addEventListener('touchend', handleTouchEnd);
     element.addEventListener('touchcancel', handleTouchCancel);
-
     return () => {
       element.removeEventListener('dragstart', handleDragStart as (e: DragEvent) => void);
       element.removeEventListener('dragend', handleDragEnd);
@@ -194,6 +197,22 @@ export function EmployeeCard({
       element.removeEventListener('touchcancel', handleTouchCancel);
     };
   }, [employee.id, isDraggable, employee.isOnLeave, handleDragStart, handleDragEnd]);
+
+  // 添加进入工地的动画效果
+  useEffect(() => {
+    const element = cardRef.current;
+    
+    if (isSelected && element) {
+      element.style.transition = 'transform 0.3s ease';
+    }
+    
+    return () => {
+      if (element) {
+        element.removeEventListener('dragstart', handleDragStart as (e: DragEvent) => void);
+        element.removeEventListener('dragend', handleDragEnd);
+      }
+    };
+  }, [employee.id, isDraggable, employee.isOnLeave, handleDragStart, handleDragEnd, isSelected]);
 
   // 切换员工休假状态
   const toggleLeaveStatus = (e: React.MouseEvent) => {
@@ -205,20 +224,22 @@ export function EmployeeCard({
 
    return (
      <div
-      ref={cardRef}
+       ref={cardRef}
+       onClick={() => onSelect && onSelect()}
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
         className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
-          "transition-all duration-200",
-             employee.isOnLeave 
-               ? "bg-[#abd1c6] opacity-60" 
-               : !isDraggable 
-                 ? "bg-[#abd1c6] opacity-70" 
-                 : "bg-[#abd1c6]",
+             "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target transition-all duration-200",
+           employee.isOnLeave 
+             ? "bg-[#abd1c6] opacity-60" 
+             : !isDraggable 
+               ? "bg-[#abd1c6] opacity-70" 
+               : "bg-[#abd1c6]",
            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-           onDoubleClick ? "cursor-pointer" : ""
-        )}
+           onDoubleClick ? "cursor-pointer" : "",
+           isSelected ? "transform rotate-20 scale-110 shadow-lg ring-2 ring-blue-500" : "",
+           isSelected && employee.isOnLeave ? "opacity-80" : ""
+         )}
     >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}

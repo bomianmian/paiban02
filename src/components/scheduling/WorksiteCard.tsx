@@ -4,13 +4,16 @@ import { Worksite, Employee } from "@/mocks/schedulingData";
 import { Building2, X } from "lucide-react";
 import { EmployeeCard } from "./EmployeeCard";
 
-interface WorksiteCardProps {
-    worksite: Worksite;
-    employees: Employee[];
-    onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
-    onAddEmployee: (worksiteId: string, employeeId: string) => void;
-    onDeleteWorksite: (worksiteId: string) => void;
-    onSettingsClick?: (worksiteId: string) => void;
+    interface WorksiteCardProps {
+  worksite: Worksite;
+  employees: Employee[];
+  onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
+  onAddEmployee: (worksiteId: string, employeeId: string) => void;
+  onDeleteWorksite: (worksiteId: string) => void;
+  onSettingsClick?: (worksiteId: string) => void;
+  onClick?: () => void;
+  isEmployeeSelected?: (id: string) => boolean;
+  onEmployeeSelect?: (id: string) => void;
 }
 
 export function WorksiteCard(
@@ -20,7 +23,10 @@ export function WorksiteCard(
         onRemoveEmployee,
         onAddEmployee,
         onDeleteWorksite,
-        onSettingsClick
+        onSettingsClick,
+        onClick,
+        isEmployeeSelected,
+        onEmployeeSelect
     }: WorksiteCardProps
 ) {
     const [isOver, setIsOver] = useState(false);
@@ -33,7 +39,7 @@ export function WorksiteCard(
     const match = worksiteName.match(/(\d+)平/);
     return match ? parseInt(match[1], 10) : 80;
   };
-  const maxArea = getMaxArea(worksite.name || '');
+  const maxArea = getMaxArea(worksite.name);
   const currentArea = scheduledEmployees.reduce((sum, emp) => sum + (emp.score * 10), 0);
   const progressPercentage = (currentArea / maxArea) * 100;
   
@@ -172,12 +178,13 @@ export function WorksiteCard(
     return (
     <div 
             ref={dropZoneRef}
-       className={cn(
-  "relative",
-    "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
-      isOver ? "bg-blue-50 shadow-lg" : ""
-            )}
-        >
+         className={cn(
+   "relative cursor-pointer",
+     "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+       isOver ? "bg-blue-50 shadow-lg" : ""
+              )}
+           onClick={onClick}
+         >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">
               <div 
@@ -204,14 +211,16 @@ export function WorksiteCard(
                 {scheduledEmployees.length > 0 ? scheduledEmployees.map(
                      employee => (
                         <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-1 rounded-lg min-w-[34px] flex-shrink-0 border border-white/30">
-                            <EmployeeCard
-                                employee={employee}
-                                onToggleLeave={toggleEmployeeLeave}
-                                isDraggable={true}
-                                showSettingsButton={false}
-                                showStatusButton={false}
-                                onDoubleClick={() => removeEmployee(employee.id)} />
-                        </div>
+                             <EmployeeCard
+                                 employee={employee}
+                                 onToggleLeave={toggleEmployeeLeave}
+                                  isDraggable={true}
+                                  isSelected={isEmployeeSelected?.(employee.id) || false}
+                                  onSelect={() => onEmployeeSelect?.(employee.id)}
+                                 showSettingsButton={false}
+                                 showStatusButton={false}
+                                 onDoubleClick={() => removeEmployee(employee.id)} />
+                         </div>
                     )
                 ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">
                         未分配员工

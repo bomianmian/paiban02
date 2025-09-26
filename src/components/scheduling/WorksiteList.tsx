@@ -4,7 +4,7 @@ import { Worksite, Employee } from '@/mocks/schedulingData';
 import { WorksiteCard } from './WorksiteCard';
 import { AddButton } from './AddButton';
 
-interface WorksiteListProps {
+     interface WorksiteListProps {
   worksites: Worksite[];
   employees: Employee[];
   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
@@ -12,6 +12,9 @@ interface WorksiteListProps {
   onAddWorksite: () => void;
   onDeleteWorksite: (worksiteId: string) => void;
   onWorksiteSettings?: (worksiteId: string) => void;
+  onWorksiteClick?: (worksiteId: string) => void;
+  isEmployeeSelected?: (id: string) => boolean;
+  onEmployeeSelect?: (id: string) => void;
 }
 
 /**
@@ -24,7 +27,10 @@ export function WorksiteList({
   onAddEmployee, 
   onAddWorksite,
   onDeleteWorksite,
-  onWorksiteSettings
+  onWorksiteSettings,
+  onWorksiteClick,
+  isEmployeeSelected,
+  onEmployeeSelect
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -63,14 +69,17 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-              <WorksiteCard 
-                worksite={worksite}
-                employees={employees}
-                onRemoveEmployee={onRemoveEmployee}
-                onAddEmployee={onAddEmployee}
-                onDeleteWorksite={onDeleteWorksite}
-                onSettingsClick={onWorksiteSettings}
-              />
+                <WorksiteCard 
+                  worksite={worksite}
+                  employees={employees}
+                  onRemoveEmployee={onRemoveEmployee}
+                  onAddEmployee={onAddEmployee}
+                  onDeleteWorksite={onDeleteWorksite}
+                  onSettingsClick={onWorksiteSettings}
+                  onClick={() => onWorksiteClick?.(worksite.id)}
+                  isEmployeeSelected={isEmployeeSelected}
+                  onEmployeeSelect={onEmployeeSelect}
+                 />
           </div>
         ))}
       </div>
