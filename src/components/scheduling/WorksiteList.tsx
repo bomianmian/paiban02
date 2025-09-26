@@ -4,15 +4,16 @@ import { Worksite, Employee } from '@/mocks/schedulingData';
 import { WorksiteCard } from './WorksiteCard';
 import { AddButton } from './AddButton';
 
-   interface WorksiteListProps {
-   worksites: Worksite[];
-   employees: Employee[];
-   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
-   onAddEmployee: (worksiteId: string, employeeId: string) => void;
-   onAddWorksite: () => void;
-   onDeleteWorksite: (worksiteId: string) => void;
-   onWorksiteSettings?: (worksiteId: string) => void;
-   onWorksiteClick?: (worksiteId: string) => void;
+interface WorksiteListProps {
+  worksites: Worksite[];
+  selectedWorksiteId?: string | null;
+  onWorksiteSelect?: (worksiteId: string) => void;
+  employees: Employee[];
+  onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
+  onAddEmployee: (worksiteId: string, employeeId: string) => void;
+  onAddWorksite: () => void;
+  onDeleteWorksite: (worksiteId: string) => void;
+  onWorksiteSettings?: (worksiteId: string) => void;
 }
 
 /**
@@ -26,7 +27,8 @@ export function WorksiteList({
   onAddWorksite,
   onDeleteWorksite,
   onWorksiteSettings,
-  onWorksiteClick
+  selectedWorksiteId,
+  onWorksiteSelect
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -65,17 +67,18 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-               <WorksiteCard 
-                 worksite={worksite}
-                 employees={employees}
-                 onRemoveEmployee={onRemoveEmployee}
-                 onAddEmployee={onAddEmployee}
-                 onDeleteWorksite={onDeleteWorksite}
-                  onSettingsClick={onWorksiteSettings}
-                  onClick={() => onWorksiteClick?.(worksite.id)}
-                />
-          </div>
-        ))}
+              <WorksiteCard 
+                worksite={worksite}
+                employees={employees}
+                onRemoveEmployee={onRemoveEmployee}
+                onAddEmployee={onAddEmployee}
+                onDeleteWorksite={onDeleteWorksite}
+                onSettingsClick={onWorksiteSettings}
+                isSelected={selectedWorksiteId === worksite.id}
+                onSelect={() => onWorksiteSelect && onWorksiteSelect(worksite.id)}
+              />
+           </div>
+         ))}
       </div>
       
 

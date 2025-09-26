@@ -21,8 +21,6 @@ export default function SchedulingPage() {
   const [worksites, setWorksites] = useState<Worksite[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -31,6 +29,14 @@ export default function SchedulingPage() {
   const [isNewEmployeeModalOpen, setIsNewEmployeeModalOpen] = useState(false);
   const [isEmployeeToolbarExpanded, setIsEmployeeToolbarExpanded] = useState(true);
   const [isCircularTextVisible, setIsCircularTextVisible] = useState(true);
+  const [selectedWorksiteId, setSelectedWorksiteId] = useState<string | null>(null);
+  
+  const handleEmployeeAssign = (employeeId: string) => {
+    if (selectedWorksiteId) {
+      addEmployeeToWorksite(selectedWorksiteId, employeeId);
+      // 保持选中状态，不清除选择
+    }
+  };
   // 加载状态管理
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -169,39 +175,27 @@ export default function SchedulingPage() {
         setIsLoadingData(false);
       }
     };
-     
-     loadData();
-     
-     // 检测是否为移动设备
-     const checkMobileDevice = () => {
-       const isMobileDevice = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-       setIsMobile(isMobileDevice);
-     };
-     
-     // 初始检测
-     checkMobileDevice();
-     // 窗口大小变化时重新检测
-     window.addEventListener('resize', checkMobileDevice);
-     
-     // 处理滚动事件以自动隐藏/显示标题
-   const handleScroll = () => {
-   const currentScrollY = window.scrollY;
-   
-   // 当滚动超过10px且向下滚动时隐藏标题，隐藏后不再自动显示
-   if (currentScrollY > 10 && currentScrollY > lastScrollY.current) {
-     setIsHeaderVisible(false);
-   }
-     
-   lastScrollY.current = currentScrollY;
- };
-     
-     window.addEventListener('scroll', handleScroll, { passive: true });
-     
-     // 清理事件监听器
-     return () => {
-       window.removeEventListener('scroll', handleScroll);
-       window.removeEventListener('resize', checkMobileDevice);
-     };
+    
+    loadData();
+    
+    // 处理滚动事件以自动隐藏/显示标题
+  const handleScroll = () => {
+  const currentScrollY = window.scrollY;
+  
+  // 当滚动超过10px且向下滚动时隐藏标题，隐藏后不再自动显示
+  if (currentScrollY > 10 && currentScrollY > lastScrollY.current) {
+    setIsHeaderVisible(false);
+  }
+    
+  lastScrollY.current = currentScrollY;
+};
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // 清理事件监听器
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
   
   // 保存数据到本地存储
@@ -214,71 +208,39 @@ export default function SchedulingPage() {
     }
   }, [worksites, employees]);
   
-   // 切换员工休假状态
-   const toggleEmployeeLeave = (employeeId: string) => {
-     setEmployees(prev => 
-       prev.map(emp => 
-         emp.id === employeeId 
-           ? { ...emp, isOnLeave: !emp.isOnLeave } 
-           : emp
-       )
-     );
-   };
-   
-   // 处理员工选择
-   const handleEmployeeSelect = (employeeId: string) => {
-     // 如果是移动端且不是拖拽状态
-     if (isMobile) {
-       setSelectedEmployeeId(prev => 
-         prev === employeeId ? null : employeeId
-       );
-     }
-   };
-   
-   // 检查员工是否被选中
-   const isEmployeeSelected = (employeeId: string) => {
-     return selectedEmployeeId === employeeId;
-   };
+  // 切换员工休假状态
+  const toggleEmployeeLeave = (employeeId: string) => {
+    setEmployees(prev => 
+      prev.map(emp => 
+        emp.id === employeeId 
+          ? { ...emp, isOnLeave: !emp.isOnLeave } 
+          : emp
+      )
+    );
+  };
   
-   // 添加员工到工地
-   const addEmployeeToWorksite = (worksiteId: string, employeeId: string) => {
-     setWorksites(prev => 
-       prev.map(worksite => {
-         // 如果是目标工地，添加员工
-         if (worksite.id === worksiteId) {
-           return { 
-             ...worksite, 
-             scheduledEmployees: [...worksite.scheduledEmployees, employeeId] 
-           };
-         }
-         // 如果是其他工地且包含该员工，移除员工
-         if (worksite.scheduledEmployees.includes(employeeId)) {
-           return {
-             ...worksite,
-             scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
-           };
-         }
-         return worksite;
-       })
-     );
-     
-     // 添加成功后清除选中状态
-     setSelectedEmployeeId(null);
-     
-     // 显示成功提示
-     const employee = employees.find(emp => emp.id === employeeId);
-     const worksite = worksites.find(ws => ws.id === worksiteId);
-     if (employee && worksite) {
-       toast.success(`${employee.name}已分配到${worksite.name}`);
-     }
-   };
-   
-   // 工地点击处理 - 移动端分配员工
-   const handleWorksiteClick = (worksiteId: string) => {
-     if (isMobile && selectedEmployeeId) {
-       addEmployeeToWorksite(worksiteId, selectedEmployeeId);
-     }
-   };
+  // 添加员工到工地
+  const addEmployeeToWorksite = (worksiteId: string, employeeId: string) => {
+    setWorksites(prev => 
+      prev.map(worksite => {
+        // 如果是目标工地，添加员工
+        if (worksite.id === worksiteId) {
+          return { 
+            ...worksite, 
+            scheduledEmployees: [...worksite.scheduledEmployees, employeeId] 
+          };
+        }
+        // 如果是其他工地且包含该员工，移除员工
+        if (worksite.scheduledEmployees.includes(employeeId)) {
+          return {
+            ...worksite,
+            scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
+          };
+        }
+        return worksite;
+      })
+    );
+  };
   
   // 从工地移除员工
   const removeEmployeeFromWorksite = (worksiteId: string, employeeId: string) => {
@@ -496,7 +458,16 @@ const closeNewEmployeeModal = () => {
           sparkCount={8}
           duration={400}
         >
-         <div className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}>
+        <div 
+          className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" 
+          style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}
+          onClick={(e) => {
+            // 点击空白区域取消选中
+            if (e.target === e.currentTarget) {
+              setSelectedWorksiteId(null);
+            }
+          }}
+        >
         {/* 圆形文字背景 - 成功提交后隐藏 */}
          {/* 加载状态覆盖层 */}
          <FullScreenLoading 
@@ -520,7 +491,7 @@ const closeNewEmployeeModal = () => {
         {/* 左上角悬浮的完成按钮 */}
          <button
           onClick={handleComplete}
-           className="fixed top-4 left-4 w-10 h-10 p-2 shadow-lg bg-[#f9bc60] hover:bg-[#e6ac50] rounded-full z-30 flex items-center justify-center text-white"
+            className="fixed top-4 left-4 w-9 h-9 p-2 shadow-lg bg-[#f9bc60] hover:bg-[#e6ac50] rounded-full z-30 flex items-center justify-center text-white"
           aria-label="完成排班"
         >
           <i class="fa-solid fa-check"></i>
@@ -570,34 +541,34 @@ const closeNewEmployeeModal = () => {
        
        {/* 工地列表区域 */}
           <div className="pt-6 pb-4">
-        <WorksiteList 
-         worksites={worksites}
-         employees={employees}
-         onRemoveEmployee={removeEmployeeFromWorksite}
-         onAddEmployee={addEmployeeToWorksite}
-         onWorksiteClick={handleWorksiteClick}
-         onAddWorksite={addNewWorksite}
-         onDeleteWorksite={deleteWorksite}
-          onWorksiteSettings={(id) => {
-            const worksite = worksites.find(w => w.id === id);
-            if (worksite) openWorksiteSettingsModal(worksite);
-          }}
-       />
+           <WorksiteList 
+            worksites={worksites}
+            employees={employees}
+            onRemoveEmployee={removeEmployeeFromWorksite}
+            onAddEmployee={addEmployeeToWorksite}
+            onAddWorksite={addNewWorksite}
+            onDeleteWorksite={deleteWorksite}
+            onWorksiteSettings={(id) => {
+              const worksite = worksites.find(w => w.id === id);
+              if (worksite) openWorksiteSettingsModal(worksite);
+            }}
+            selectedWorksiteId={selectedWorksiteId}
+            onWorksiteSelect={setSelectedWorksiteId}
+        />
        
        {/* 底部员工工具栏 */}
-          <EmployeeToolbar 
+         <EmployeeToolbar 
             employees={employees}
             onToggleLeave={toggleEmployeeLeave}
             onAddEmployee={openNewEmployeeModal}
             assignedEmployeeIds={assignedEmployeeIds}
             onDeleteEmployee={deleteEmployee}
             onSettingsClick={navigateToEmployeeEdit}
-            onEmployeeSelect={handleEmployeeSelect}
-            isEmployeeSelected={isEmployeeSelected}
             isExpanded={isEmployeeToolbarExpanded}
-            onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
-            isMobile={isMobile}
-         />
+          onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
+          selectedWorksiteId={selectedWorksiteId}
+          onEmployeeAssign={handleEmployeeAssign}
+       />
           </div>
 
        {/* 员工信息设置模态框 */}

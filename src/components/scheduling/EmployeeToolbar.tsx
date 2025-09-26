@@ -5,19 +5,22 @@ import { EmployeeCard } from './EmployeeCard';
 import { AddButton } from './AddButton';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
- interface EmployeeToolbarProps {
-   employees: Employee[];
-   onToggleLeave: (id: string) => void;
-   onAddEmployee: () => void;
-   assignedEmployeeIds: Set<string>;
-   onDeleteEmployee: (id: string) => void;
-   onSettingsClick?: (id: string) => void;
-   onEmployeeSelect: (id: string) => void;
-   isEmployeeSelected: (id: string) => boolean;
-   isExpanded: boolean;
-   onToggleExpand: () => void;
-   isMobile: boolean;
- }
+interface EmployeeToolbarProps {
+  employees: Employee[];
+  onToggleLeave: (id: string) => void;
+  onAddEmployee: () => void;
+  assignedEmployeeIds: Set<string>;
+  onDeleteEmployee: (id: string) => void;
+  selectedWorksiteId?: string | null;
+  onEmployeeAssign?: (employeeId: string) => void;
+  onSettingsClick?: (id: string) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onImport: () => void;
+  onExport: () => void;
+  selectedWorksiteId?: string | null;
+  onEmployeeAssign?: (employeeId: string) => void;
+}
 
 /**
  * 员工工具栏组件 - 底部显示所有员工卡片
@@ -33,9 +36,8 @@ export function EmployeeToolbar({
   onToggleExpand,
   onImport,
   onExport,
-  isMobile,
-  onEmployeeSelect,
-  isEmployeeSelected
+  selectedWorksiteId,
+  onEmployeeAssign
 }: EmployeeToolbarProps) {
   // 过滤员工：只显示未分配的员工（包括请假员工）
   // 过滤并排序员工：未分配的员工中，未请假的排在前面，请假的排在后面
@@ -60,11 +62,11 @@ export function EmployeeToolbar({
     <div className="flex items-center space-x-4">
       <h2 className="text-lg font-semibold text-white">员工列表</h2>
     </div>
-    <div className="flex items-center space-x-2">
-        {isExpanded && <AddButton onClick={onAddEmployee} className="w-10 h-10" />}
+      <div className="flex items-center space-x-2">
+        {isExpanded && <AddButton onClick={onAddEmployee} className="w-[30px] h-[30px]" />}
       <button
-        onClick={toggleExpand}
-        className="flex items-center justify-center rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors"
+         onClick={toggleExpand}
+        className="flex items-center justify-center rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors w-[30px] h-[30px]"
         aria-label={isExpanded ? "收起员工列表" : "展开员工列表"}
       >
         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -84,19 +86,19 @@ export function EmployeeToolbar({
           {filteredEmployees.length > 0 ? (
             filteredEmployees.map(employee => (
                <div key={employee.id} className="min-w-[80px]">
-               <EmployeeCard 
-                   employee={employee}
-                   onToggleLeave={onToggleLeave}
-                   isDraggable={!employee.isOnLeave && !isMobile}
-                   isSelected={isEmployeeSelected(employee.id)}
-                   onSelect={() => onEmployeeSelect(employee.id)}
+                  <EmployeeCard 
+                    employee={employee}
+                    onToggleLeave={onToggleLeave}
+                    isDraggable={!employee.isOnLeave}
                     onDoubleClick={() => {
                       onSettingsClick && onSettingsClick(employee.id);
                     }}
                     onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
-                      showSettingsButton={false}
-                     showStatusButton={true}
-                 />
+                    showSettingsButton={false}
+                    showStatusButton={true}
+                    selectedWorksiteId={selectedWorksiteId}
+                    onAssign={onEmployeeAssign}
+                  />
               </div>
            ))
           ) : (
@@ -114,8 +116,8 @@ export function EmployeeToolbar({
       isExpanded ? 'max-h-4 opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0'
     }`}
   >
-     <div className="text-center text-xs" style={{ color: '#abd1c6' }}>
-  拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
+      <div className="text-center text-xs hidden md:block" style={{ color: '#abd1c6' }}>
+   拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
 </div>
   </div>
     </div>

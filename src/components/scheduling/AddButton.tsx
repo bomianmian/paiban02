@@ -13,10 +13,10 @@ export function AddButton({ onClick, className }: AddButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={cn(
-         "flex items-center justify-center rounded-full bg-[#f9bc60] text-white p-2 shadow-lg hover:bg-[#e6ac50] transition-all duration-200 active:scale-95",
-        className
-      )}
+        className={cn(
+          "flex items-center justify-center rounded-full bg-[#f9bc60] text-white p-2 shadow-lg hover:bg-[#e6ac50] transition-all duration-200 active:scale-95 w-9 h-9",
+          className
+        )}
       aria-label="添加"
     >
       <Plus size={18} />
