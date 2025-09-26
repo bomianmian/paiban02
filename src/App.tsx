@@ -17,11 +17,14 @@ export default function App() {
     <AuthContext.Provider
       value={{ isAuthenticated, setIsAuthenticated, logout }}
     >
-      <TargetCursor 
-        targetSelector=".cursor-target" 
-        spinDuration={2} 
-        hideDefaultCursor={true} 
-      />
+      {/* 在移动设备上禁用自定义光标 */}
+      {typeof window !== 'undefined' && window.innerWidth >= 768 && (
+        <TargetCursor 
+          targetSelector=".cursor-target" 
+          spinDuration={2} 
+          hideDefaultCursor={true} 
+        />
+      )}
       <Routes>
         <Route path="/" element={<Navigate to="/scheduling" replace />} />
         <Route path="/scheduling" element={<SchedulingPage />} />

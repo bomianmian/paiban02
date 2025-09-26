@@ -213,7 +213,7 @@ export function EmployeeCard({
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
         className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
+            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target touch-manipulation",
           "transition-all duration-200",
              employee.isOnLeave 
                ? "bg-[#abd1c6] opacity-60" 
@@ -269,7 +269,7 @@ export function EmployeeCard({
           <button
             onClick={toggleLeaveStatus}
             className={cn(
-              "mt-1.5 text-[10px] px-1.5 py-0.5 rounded",
+             "mt-1.5 text-[10px] px-1.5 py-0.5 rounded cursor-pointer",
               employee.isOnLeave 
                 ? "bg-gray-200 text-gray-500" 
                 : "bg-blue-100 text-blue-600"
