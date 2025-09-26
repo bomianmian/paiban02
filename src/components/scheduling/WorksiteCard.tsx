@@ -180,9 +180,11 @@ export function WorksiteCard(
    "relative",
      "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
        isOver ? "bg-blue-50 shadow-lg" : "",
-       isSelected ? "ring-2 ring-blue-500 ring-offset-2 scale-102" : ""
+        isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
              )}
-        onClick={onSelect}
+          onClick={(e) => {
+            onSelect?.();
+          }}
         >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">

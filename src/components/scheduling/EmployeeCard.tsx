@@ -232,12 +232,12 @@ export function EmployeeCard({
             onDoubleClick ? "cursor-pointer" : "",
             selectedWorksiteId ? "cursor-pointer hover:scale-105" : ""
          )}
-      onClick={(e) => {
-          e.stopPropagation(); // 防止事件冒泡到工地卡片
-          if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
-            onAssign(employee.id);
-          }
-        }}
+        onClick={(e) => {
+            if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
+              console.log('Assigning employee:', employee.id, 'to worksite:', selectedWorksiteId);
+              onAssign(employee.id);
+            }
+          }}
      >
           {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}
