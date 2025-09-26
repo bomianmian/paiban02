@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Employee } from '@/mocks/schedulingData';
 import { User } from 'lucide-react';
+import { toast } from 'sonner';
 
 
 
@@ -18,6 +19,7 @@ interface EmployeeCardProps {
   showStatusButton?: boolean;
   selectedWorksiteId?: string | null;
   onAssign?: (employeeId: string) => void;
+  assignedEmployeeIds: Set<string>;
 }
 
 /**
@@ -32,7 +34,8 @@ export function EmployeeCard({
   showSettingsButton = true,
   showStatusButton = true,
   selectedWorksiteId,
-  onAssign
+  onAssign,
+  assignedEmployeeIds
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
@@ -228,16 +231,26 @@ export function EmployeeCard({
                : !isDraggable 
                  ? "bg-[#abd1c6] opacity-70" 
                  : "bg-[#abd1c6]",
-           isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
             onDoubleClick ? "cursor-pointer" : "",
-            selectedWorksiteId ? "cursor-pointer hover:scale-105" : ""
-         )}
-        onClick={(e) => {
-            if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
-              console.log('Assigning employee:', employee.id, 'to worksite:', selectedWorksiteId);
-              onAssign(employee.id);
-            }
-          }}
+             selectedWorksiteId && assignedEmployeeIds?.has(employee.id) ? "opacity-50 cursor-not-allowed" : "",
+             selectedWorksiteId ? "cursor-pointer hover:scale-105" : "",
+              selectedWorksiteId && assignedEmployeeIds?.has(employee.id) ? "opacity-50 cursor-not-allowed" : ""
+          )}
+          onClick={(e) => {
+              // 检查员工是否已分配到某个工地
+              const isAssigned = assignedEmployeeIds?.has(employee.id) ?? false;
+              
+              if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
+                // 如果员工已分配且当前有选中的工地，阻止操作
+                if (isAssigned) {
+                  toast.error('无法移动已分配的员工，请先从原工地移除');
+                  return;
+                }
+                console.log('Assigning employee:', employee.id, 'to worksite:', selectedWorksiteId);
+                onAssign(employee.id);
+              }
+            }}
      >
           {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}

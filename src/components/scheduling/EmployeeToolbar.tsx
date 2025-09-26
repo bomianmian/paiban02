@@ -96,9 +96,10 @@ export function EmployeeToolbar({
                     onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
                     showSettingsButton={false}
                     showStatusButton={true}
-                    selectedWorksiteId={selectedWorksiteId}
-                    onAssign={onEmployeeAssign}
-                  />
+                     selectedWorksiteId={selectedWorksiteId}
+                     onAssign={onEmployeeAssign}
+                     assignedEmployeeIds={assignedEmployeeIds}
+                   />
               </div>
            ))
           ) : (

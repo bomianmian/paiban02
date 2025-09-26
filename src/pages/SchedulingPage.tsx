@@ -220,27 +220,39 @@ export default function SchedulingPage() {
   };
   
   // 添加员工到工地
-  const addEmployeeToWorksite = (worksiteId: string, employeeId: string) => {
-    setWorksites(prev => 
-      prev.map(worksite => {
-        // 如果是目标工地，添加员工
-        if (worksite.id === worksiteId) {
-          return { 
-            ...worksite, 
-            scheduledEmployees: [...worksite.scheduledEmployees, employeeId] 
-          };
-        }
-        // 如果是其他工地且包含该员工，移除员工
-        if (worksite.scheduledEmployees.includes(employeeId)) {
-          return {
-            ...worksite,
-            scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
-          };
-        }
-        return worksite;
-      })
-    );
-  };
+const addEmployeeToWorksite = (worksiteId: string, employeeId: string) => {
+  // 找到员工当前所在的工地
+  const currentWorksite = worksites.find(worksite => 
+    worksite.scheduledEmployees.includes(employeeId)
+  );
+  
+  // 检查当前工地是否已激活
+  if (currentWorksite && currentWorksite.id === selectedWorksiteId) {
+    // 当前工地已激活，阻止移动并显示提示
+    toast.error('无法移动已激活工地的员工，请先取消激活该工地');
+    return;
+  }
+
+  setWorksites(prev => 
+    prev.map(worksite => {
+      // 如果是目标工地，添加员工
+      if (worksite.id === worksiteId) {
+        return { 
+          ...worksite, 
+          scheduledEmployees: [...worksite.scheduledEmployees, employeeId] 
+        };
+      }
+      // 如果是其他工地且包含该员工，移除员工
+      if (worksite.scheduledEmployees.includes(employeeId)) {
+        return {
+          ...worksite,
+          scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
+        };
+      }
+      return worksite;
+    })
+  );
+};
   
   // 从工地移除员工
   const removeEmployeeFromWorksite = (worksiteId: string, employeeId: string) => {
