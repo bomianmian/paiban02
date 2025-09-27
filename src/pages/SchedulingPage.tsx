@@ -444,13 +444,7 @@ const closeNewEmployeeModal = () => {
      };
    
     return (
-        <ClickSpark
-          sparkColor='#fff'
-          sparkSize={10}
-          sparkRadius={15}
-          sparkCount={8}
-          duration={400}
-        >
+
          <div className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}>
         {/* 圆形文字背景 - 成功提交后隐藏 */}
          {/* 加载状态覆盖层 */}
@@ -625,6 +619,6 @@ const closeNewEmployeeModal = () => {
            )}
          </div>
        </div>
-        </ClickSpark>
+
     );
 }

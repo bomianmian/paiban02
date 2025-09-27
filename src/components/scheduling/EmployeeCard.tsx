@@ -212,15 +212,15 @@ export function EmployeeCard({
           onDoubleClick={onDoubleClick}
           onClick={onClick ? () => onClick(employee.id) : undefined}
            className={cn(
-             "flex flex-col items-center justify-center p-4 rounded-none cursor-move min-w-[80px] min-h-[80px] cursor-target employee-card",
-             "transition-all duration-200",
-              employee.isOnLeave 
-                ? "bg-[#abd1c6] opacity-60" 
-                : !isDraggable 
-                  ? "bg-[#abd1c6] opacity-70" 
-                  : "bg-[#abd1c6]",
-            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md hover:scale-105",
-            onDoubleClick ? "cursor-pointer" : ""
+              "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target employee-card",
+            "transition-all duration-200",
+               employee.isOnLeave 
+                 ? "bg-[#abd1c6] opacity-60" 
+                 : !isDraggable 
+                   ? "bg-[#abd1c6] opacity-70" 
+                   : "bg-[#abd1c6]",
+             isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+             onDoubleClick ? "cursor-pointer" : ""
           )}
       >
          {/* 员工头像与姓名组合 */}
