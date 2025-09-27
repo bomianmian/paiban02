@@ -221,13 +221,23 @@ export function EmployeeCard({
             isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
             onDoubleClick ? "cursor-pointer" : ""
          )}
-           onClick={(e) => {
-             // 在移动端点击添加员工到激活工地
-             if (typeof window !== 'undefined' && window.innerWidth <= 768 && onEmployeeClick && !employee.isOnLeave) {
-               e.stopPropagation();
-               onEmployeeClick(employee.id);
-             }
-           }}
+            onClick={(e) => {
+              // 在移动端点击添加员工到激活工地
+              const isMobile = typeof window !== 'undefined' && 
+                (window.innerWidth <= 768 || 
+                 /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+              
+              if (isMobile && onEmployeeClick && !employee.isOnLeave) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                  onEmployeeClick(employee.id);
+                } catch (error) {
+                  console.error('Failed to add employee to worksite:', error);
+                }
+              }
+            }}
     >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}

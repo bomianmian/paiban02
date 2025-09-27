@@ -61,24 +61,44 @@ export default function SchedulingPage() {
       return;
     }
     
+    // 查找员工信息
+    const employee = employees.find(emp => emp.id === employeeId);
+    if (!employee) {
+      console.error('Employee not found:', employeeId);
+      toast.error('员工不存在');
+      return;
+    }
+    
     // 检查员工是否已在其他工地
     const employeeAlreadyAssigned = worksites.some(worksite => 
       worksite.scheduledEmployees.includes(employeeId)
     );
     
-    if (employeeAlreadyAssigned) {
-      // 从其他工地移除员工
-      setWorksites(prev => 
-        prev.map(worksite => ({
-          ...worksite,
-          scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
-        }))
-      );
-    }
-    
-    // 添加员工到激活工地
-    addEmployeeToWorksite(activeWorksiteId, employeeId);
-
+    // 使用函数式更新确保获取最新状态
+    setWorksites(prevWorksites => {
+      // 如果员工已在其他工地，先移除
+      const updatedWorksites = prevWorksites.map(worksite => {
+        if (employeeAlreadyAssigned && worksite.scheduledEmployees.includes(employeeId)) {
+          return {
+            ...worksite,
+            scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
+          };
+        }
+        
+        // 添加员工到激活工地
+        if (worksite.id === activeWorksiteId) {
+          return {
+            ...worksite,
+            scheduledEmployees: [...worksite.scheduledEmployees, employeeId]
+          };
+        }
+        
+        return worksite;
+      });
+      
+      // 强制状态更新
+      return [...updatedWorksites];
+    });
   };
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
