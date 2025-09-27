@@ -553,11 +553,10 @@ const closeNewEmployeeModal = () => {
              onDeleteEmployee={deleteEmployee}
              onSettingsClick={navigateToEmployeeEdit}
               onEmployeeCardClick={(employeeId) => {
-               if (employeeId && activeWorksiteId) {
-                 addEmployeeToWorksite(activeWorksiteId, employeeId);
-                 toast.success('员工已分配到激活工地');
-               }
-             }}
+                if (employeeId && activeWorksiteId) {
+                  addEmployeeToWorksite(activeWorksiteId, employeeId);
+                }
+              }}
             isExpanded={isEmployeeToolbarExpanded}
              onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
          />

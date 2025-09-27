@@ -39,7 +39,7 @@ export function EmployeeToolbar({
   // 过滤并排序员工：未分配的员工中，未请假的排在前面，请假的排在后面
   const filteredEmployees = useMemo(() => {
     return employees
-      .filter(employee => !assignedEmployeeIds.has(employee.id))
+      .filter(employee => employee && !assignedEmployeeIds.has(employee.id))
       .sort((a, b) => {
         // 请假员工排在后面
         if (a.isOnLeave && !b.isOnLeave) return 1;
