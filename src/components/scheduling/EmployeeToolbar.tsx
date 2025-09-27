@@ -111,7 +111,7 @@ export function EmployeeToolbar({
       isExpanded ? 'max-h-4 opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0'
     }`}
   >
-     <div className="text-center text-xs" style={{ color: '#abd1c6' }}>
+     <div className="text-center text-xs hidden md:block" style={{ color: '#abd1c6' }}>
   拖拽员工到工地卡片进行排班 | 点击员工状态切换休假
 </div>
   </div>
