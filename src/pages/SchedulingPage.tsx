@@ -61,7 +61,24 @@ export default function SchedulingPage() {
       return;
     }
     
+    // 检查员工是否已在其他工地
+    const employeeAlreadyAssigned = worksites.some(worksite => 
+      worksite.scheduledEmployees.includes(employeeId)
+    );
+    
+    if (employeeAlreadyAssigned) {
+      // 从其他工地移除员工
+      setWorksites(prev => 
+        prev.map(worksite => ({
+          ...worksite,
+          scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
+        }))
+      );
+    }
+    
+    // 添加员工到激活工地
     addEmployeeToWorksite(activeWorksiteId, employeeId);
+
   };
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);

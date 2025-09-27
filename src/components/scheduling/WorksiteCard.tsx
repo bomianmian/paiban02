@@ -179,11 +179,11 @@ export function WorksiteCard(
         className={cn(
    "relative",
      "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation cursor-pointer",
-       isOver ? "bg-blue-50 shadow-lg" : "",
-       isActive ? "ring-2 ring-[#f9bc60] shadow-lg" : ""
-             )}
-             onClick={() => {
-               // 只在移动端点击激活工地
+        isOver ? "bg-blue-50 shadow-lg" : "",
+        isActive ? "ring-2 ring-[#f9bc60] shadow-lg scale-[1.02]" : ""
+              )}
+              onClick={() => {
+                // 移动端和桌面端都可以点击激活工地
                if (typeof window !== 'undefined' && window.innerWidth <= 768 && onActivate) {
                  onActivate();
                }
