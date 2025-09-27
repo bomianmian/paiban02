@@ -6,14 +6,15 @@ import { AddButton } from './AddButton';
 
 interface WorksiteListProps {
   worksites: Worksite[];
-  selectedWorksiteId?: string | null;
-  onWorksiteSelect?: (worksiteId: string) => void;
   employees: Employee[];
   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
   onAddEmployee: (worksiteId: string, employeeId: string) => void;
   onAddWorksite: () => void;
   onDeleteWorksite: (worksiteId: string) => void;
   onWorksiteSettings?: (worksiteId: string) => void;
+  isMobile?: boolean;
+  activeWorksiteId?: string | null;
+  onWorksiteClick?: (worksiteId: string) => void;
 }
 
 /**
@@ -26,9 +27,7 @@ export function WorksiteList({
   onAddEmployee, 
   onAddWorksite,
   onDeleteWorksite,
-  onWorksiteSettings,
-  selectedWorksiteId,
-  onWorksiteSelect
+  onWorksiteSettings
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -74,11 +73,9 @@ export function WorksiteList({
                 onAddEmployee={onAddEmployee}
                 onDeleteWorksite={onDeleteWorksite}
                 onSettingsClick={onWorksiteSettings}
-                isSelected={selectedWorksiteId === worksite.id}
-                onSelect={() => onWorksiteSelect && onWorksiteSelect(worksite.id)}
               />
-           </div>
-         ))}
+          </div>
+        ))}
       </div>
       
 

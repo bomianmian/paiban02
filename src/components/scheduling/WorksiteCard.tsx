@@ -5,22 +5,20 @@ import { Building2, X } from "lucide-react";
 import { EmployeeCard } from "./EmployeeCard";
 
 interface WorksiteCardProps {
-  worksite: Worksite;
-  isSelected?: boolean;
-  onSelect?: () => void;
-  employees: Employee[];
-  onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
-  onAddEmployee: (worksiteId: string, employeeId: string) => void;
-  onDeleteWorksite: (worksiteId: string) => void;
-  onSettingsClick?: (worksiteId: string) => void;
+    worksite: Worksite;
+    employees: Employee[];
+    onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
+    onAddEmployee: (worksiteId: string, employeeId: string) => void;
+    onDeleteWorksite: (worksiteId: string) => void;
+    onSettingsClick?: (worksiteId: string) => void;
+    isActive?: boolean;
+    onClick?: () => void;
 }
 
 export function WorksiteCard(
     {
-  worksite, 
-  isSelected,
-  onSelect,
-  employees,
+        worksite,
+        employees,
         onRemoveEmployee,
         onAddEmployee,
         onDeleteWorksite,
@@ -174,17 +172,13 @@ export function WorksiteCard(
     };
 
     return (
-     <div 
-             ref={dropZoneRef}
-        className={cn(
-   "relative",
-     "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
-       isOver ? "bg-blue-50 shadow-lg" : "",
-        isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""
-             )}
-          onClick={(e) => {
-            onSelect?.();
-          }}
+    <div 
+            ref={dropZoneRef}
+       className={cn(
+  "relative",
+    "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation",
+      isOver ? "bg-blue-50 shadow-lg" : ""
+            )}
         >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">

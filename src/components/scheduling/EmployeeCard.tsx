@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Employee } from '@/mocks/schedulingData';
 import { User } from 'lucide-react';
-import { toast } from 'sonner';
 
 
 
@@ -17,9 +16,7 @@ interface EmployeeCardProps {
   onSettingsClick?: (id: string) => void;
   showSettingsButton?: boolean;
   showStatusButton?: boolean;
-  selectedWorksiteId?: string | null;
-  onAssign?: (employeeId: string) => void;
-  assignedEmployeeIds: Set<string>;
+  onClick?: () => void;
 }
 
 /**
@@ -32,10 +29,7 @@ export function EmployeeCard({
   onDoubleClick,
   onSettingsClick,
   showSettingsButton = true,
-  showStatusButton = true,
-  selectedWorksiteId,
-  onAssign,
-  assignedEmployeeIds
+  showStatusButton = true
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
@@ -63,7 +57,7 @@ export function EmployeeCard({
       const touch = e.touches[0];
       const rect = element.getBoundingClientRect();
       setTouchStartPosition({ x: touch.clientX, y: touch.clientY });
-       setTouchOffset({ 
+      setTouchOffset({ 
         x: touch.clientX - rect.left, 
         y: touch.clientY - rect.top 
       });
@@ -71,16 +65,8 @@ export function EmployeeCard({
       // 设置拖拽数据
       element.setAttribute('data-employee-id', employee.id);
       
-      // 计算触摸移动距离
-      const currentTouch = e.touches[0];
-      const dx = currentTouch.clientX - touchStartPosition.x;
-      const dy = currentTouch.clientY - touchStartPosition.y;
-      
-      // 仅在实际拖拽时才阻止默认行为
-      if (Math.abs(dx) > dragThreshold || Math.abs(dy) > dragThreshold) {
-        // 防止触摸事件导致页面滚动
-        e.preventDefault();
-      }
+      // 防止触摸事件导致页面滚动
+      e.preventDefault();
     }
   };
 
@@ -231,28 +217,11 @@ export function EmployeeCard({
                : !isDraggable 
                  ? "bg-[#abd1c6] opacity-70" 
                  : "bg-[#abd1c6]",
-            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-            onDoubleClick ? "cursor-pointer" : "",
-             selectedWorksiteId && assignedEmployeeIds?.has(employee.id) ? "opacity-50 cursor-not-allowed" : "",
-             selectedWorksiteId ? "cursor-pointer hover:scale-105" : "",
-              selectedWorksiteId && assignedEmployeeIds?.has(employee.id) ? "opacity-50 cursor-not-allowed" : ""
-          )}
-          onClick={(e) => {
-              // 检查员工是否已分配到某个工地
-              const isAssigned = assignedEmployeeIds?.has(employee.id) ?? false;
-              
-              if (selectedWorksiteId && onAssign && !employee.isOnLeave) {
-                // 如果员工已分配且当前有选中的工地，阻止操作
-                if (isAssigned) {
-                  toast.error('无法移动已分配的员工，请先从原工地移除');
-                  return;
-                }
-                console.log('Assigning employee:', employee.id, 'to worksite:', selectedWorksiteId);
-                onAssign(employee.id);
-              }
-            }}
-     >
-          {/* 员工头像与姓名组合 */}
+           isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+           onDoubleClick ? "cursor-pointer" : ""
+        )}
+    >
+         {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}
            <div className={cn(
            "w-10 h-9 rounded-lg flex items-center justify-center relative overflow-hidden",
@@ -291,7 +260,7 @@ export function EmployeeCard({
           <button
             onClick={toggleLeaveStatus}
             className={cn(
-             "mt-1.5 text-[10px] px-1.5 py-0.5 rounded cursor-pointer",
+              "mt-1.5 text-[10px] px-1.5 py-0.5 rounded",
               employee.isOnLeave 
                 ? "bg-gray-200 text-gray-500" 
                 : "bg-blue-100 text-blue-600"
