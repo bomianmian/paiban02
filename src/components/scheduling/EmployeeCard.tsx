@@ -16,7 +16,7 @@ interface EmployeeCardProps {
   onSettingsClick?: (id: string) => void;
   showSettingsButton?: boolean;
   showStatusButton?: boolean;
-  onEmployeeClick?: (employeeId: string) => void;
+  onClick?: (id: string) => void;
 }
 
 /**
@@ -30,7 +30,7 @@ export function EmployeeCard({
   onSettingsClick,
   showSettingsButton = true,
   showStatusButton = true,
-  onEmployeeClick
+  onClick
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
@@ -205,40 +205,24 @@ export function EmployeeCard({
 
 
 
-   return (
-     <div
-      ref={cardRef}
-      draggable={isDraggable}
-      onDoubleClick={onDoubleClick}
-         className={cn(
-             "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
-           "transition-all duration-200",
-              employee.isOnLeave 
-                ? "bg-[#abd1c6] opacity-60" 
-                : !isDraggable 
-                  ? "bg-[#abd1c6] opacity-70" 
-                  : "bg-[#abd1c6]",
-            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-            onDoubleClick ? "cursor-pointer" : ""
-         )}
-            onClick={(e) => {
-              // 在移动端点击添加员工到激活工地
-              const isMobile = typeof window !== 'undefined' && 
-                (window.innerWidth <= 768 || 
-                 /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-              
-              if (isMobile && onEmployeeClick && !employee.isOnLeave) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                try {
-                  onEmployeeClick(employee.id);
-                } catch (error) {
-                  console.error('Failed to add employee to worksite:', error);
-                }
-              }
-            }}
-    >
+      return (
+       <div
+        ref={cardRef}
+        draggable={isDraggable}
+          onDoubleClick={onDoubleClick}
+          onClick={onClick ? () => onClick(employee.id) : undefined}
+           className={cn(
+              "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target employee-card",
+            "transition-all duration-200",
+               employee.isOnLeave 
+                 ? "bg-[#abd1c6] opacity-60" 
+                 : !isDraggable 
+                   ? "bg-[#abd1c6] opacity-70" 
+                   : "bg-[#abd1c6]",
+             isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+             onDoubleClick ? "cursor-pointer" : ""
+          )}
+      >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}
            <div className={cn(

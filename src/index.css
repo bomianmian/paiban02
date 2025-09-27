@@ -187,14 +187,7 @@
 
 /* 移动端适配样式 */
 @media (max-width: 768px) {
-  /* 移除所有手机视图特效 */
-  .loader-wrapper, .target-cursor-wrapper, .circular-text, .click-spark {
+  .loader-wrapper, .target-cursor-wrapper {
     display: none !important;
-  }
-  
-  /* 禁用所有过渡和动画效果 */
-  * {
-    transition: none !important;
-    animation: none !important;
   }
 }

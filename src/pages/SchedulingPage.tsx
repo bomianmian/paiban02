@@ -16,11 +16,12 @@ import { toast } from 'sonner';
 import { Loading, FullScreenLoading } from '@/components/Loading';
 import ClickSpark from '@/components/ClickSpark';
 
-export default function SchedulingPage() {
+  export default function SchedulingPage() {
   // 状态管理
   const [worksites, setWorksites] = useState<Worksite[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [activeWorksiteId, setActiveWorksiteId] = useState<string | null>(null);
 
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -36,70 +37,10 @@ export default function SchedulingPage() {
   // 工地设置模态框状态
   const [isWorksiteSettingsModalOpen, setIsWorksiteSettingsModalOpen] = useState(false);
   const [selectedWorksite, setSelectedWorksite] = useState<Worksite | null>(null);
-  // 激活工地状态管理
-  const [activeWorksiteId, setActiveWorksiteId] = useState<string | null>(null);
-  
   // 日期状态管理 - 确保月份始终为当前系统月份
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
-  
-  // 设置激活工地
-  const setActiveWorksite = (worksiteId: string) => {
-    setActiveWorksiteId(worksiteId);
-  };
-  
-  // 清除激活工地
-  const clearActiveWorksite = () => {
-    setActiveWorksiteId(null);
-  };
-  
-  // 添加员工到激活工地
-  const addEmployeeToActiveWorksite = (employeeId: string) => {
-    if (!activeWorksiteId) {
-      toast.info('请先选择一个工地');
-      return;
-    }
-    
-    // 查找员工信息
-    const employee = employees.find(emp => emp.id === employeeId);
-    if (!employee) {
-      console.error('Employee not found:', employeeId);
-      toast.error('员工不存在');
-      return;
-    }
-    
-    // 检查员工是否已在其他工地
-    const employeeAlreadyAssigned = worksites.some(worksite => 
-      worksite.scheduledEmployees.includes(employeeId)
-    );
-    
-    // 使用函数式更新确保获取最新状态
-    setWorksites(prevWorksites => {
-      // 如果员工已在其他工地，先移除
-      const updatedWorksites = prevWorksites.map(worksite => {
-        if (employeeAlreadyAssigned && worksite.scheduledEmployees.includes(employeeId)) {
-          return {
-            ...worksite,
-            scheduledEmployees: worksite.scheduledEmployees.filter(id => id !== employeeId)
-          };
-        }
-        
-        // 添加员工到激活工地
-        if (worksite.id === activeWorksiteId) {
-          return {
-            ...worksite,
-            scheduledEmployees: [...worksite.scheduledEmployees, employeeId]
-          };
-        }
-        
-        return worksite;
-      });
-      
-      // 强制状态更新
-      return [...updatedWorksites];
-    });
-  };
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
   
@@ -584,34 +525,43 @@ const closeNewEmployeeModal = () => {
        
        {/* 工地列表区域 */}
           <div className="pt-6 pb-4">
-          <WorksiteList 
-           worksites={worksites}
-           employees={employees}
-           onRemoveEmployee={removeEmployeeFromWorksite}
-           onAddEmployee={addEmployeeToWorksite}
-           onAddWorksite={addNewWorksite}
-           onDeleteWorksite={deleteWorksite}
-             activeWorksiteId={activeWorksiteId}
-             onSetActiveWorksite={setActiveWorksite}
-             onWorksiteSettings={(id) => {
-               const worksite = worksites.find(w => w.id === id);
+           <WorksiteList 
+            worksites={worksites}
+            employees={employees}
+            onRemoveEmployee={removeEmployeeFromWorksite}
+            onAddEmployee={addEmployeeToWorksite}
+            onAddWorksite={addNewWorksite}
+            onDeleteWorksite={deleteWorksite}
+            onWorksiteSettings={(id) => {
+              const worksite = worksites.find(w => w.id === id);
               if (worksite) openWorksiteSettingsModal(worksite);
             }}
-       />
+            onWorksiteClick={(worksiteId) => {
+              // 处理工地卡片点击事件
+              console.log("Worksite clicked:", worksiteId);
+              setActiveWorksiteId(worksiteId);
+            }}
+            activeWorksiteId={activeWorksiteId}
+          />
        
        {/* 底部员工工具栏 */}
-         <EmployeeToolbar 
-            employees={employees}
-            onToggleLeave={toggleEmployeeLeave}
-            onAddEmployee={openNewEmployeeModal}
-            assignedEmployeeIds={assignedEmployeeIds}
-            onDeleteEmployee={deleteEmployee}
-            onSettingsClick={navigateToEmployeeEdit}
+          <EmployeeToolbar 
+             employees={employees}
+             onToggleLeave={toggleEmployeeLeave}
+             onAddEmployee={openNewEmployeeModal}
+             assignedEmployeeIds={assignedEmployeeIds}
+             onDeleteEmployee={deleteEmployee}
+             onSettingsClick={navigateToEmployeeEdit}
+              onEmployeeCardClick={(employeeId) => {
+               if (employeeId && activeWorksiteId) {
+                 addEmployeeToWorksite(activeWorksiteId, employeeId);
+                 toast.success('员工已分配到激活工地');
+               }
+             }}
             isExpanded={isEmployeeToolbarExpanded}
-           onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
-          onEmployeeClick={addEmployeeToActiveWorksite}
-          />
-         </div>
+             onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
+         />
+          </div>
 
        {/* 员工信息设置模态框 */}
         {/* 编辑员工模态框 */}

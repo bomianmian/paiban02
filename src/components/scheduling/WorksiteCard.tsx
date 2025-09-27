@@ -5,6 +5,8 @@ import { Building2, X } from "lucide-react";
 import { EmployeeCard } from "./EmployeeCard";
 
 interface WorksiteCardProps {
+  onClick?: () => void;
+  isActive?: boolean;
     worksite: Worksite;
     employees: Employee[];
     onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
@@ -12,7 +14,7 @@ interface WorksiteCardProps {
     onDeleteWorksite: (worksiteId: string) => void;
     onSettingsClick?: (worksiteId: string) => void;
     isActive?: boolean;
-    onActivate?: () => void;
+    onClick?: () => void;
 }
 
 export function WorksiteCard(
@@ -23,8 +25,8 @@ export function WorksiteCard(
         onAddEmployee,
         onDeleteWorksite,
         onSettingsClick,
-        isActive,
-        onActivate
+        onClick,
+        isActive
     }: WorksiteCardProps
 ) {
     const [isOver, setIsOver] = useState(false);
@@ -173,21 +175,17 @@ export function WorksiteCard(
         console.log(`Toggle leave status for employee ${employeeId}`);
     };
 
-     return (
+    return (
      <div 
-             ref={dropZoneRef}
-        className={cn(
-   "relative",
-     "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation cursor-pointer",
-        isOver ? "bg-blue-50 shadow-lg" : "",
-        isActive ? "ring-2 ring-[#f9bc60] shadow-lg scale-[1.02]" : ""
-              )}
-              onClick={() => {
-                // 移动端和桌面端都可以点击激活工地
-               if (typeof window !== 'undefined' && window.innerWidth <= 768 && onActivate) {
-                 onActivate();
-               }
-             }}
+               ref={dropZoneRef}
+               onClick={onClick}
+          className={cn(
+            "relative",
+            "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation cursor-pointer",
+            isOver ? "bg-blue-50 shadow-lg" : "",
+            isActive ? "ring-4 ring-yellow-400 z-10" : ""
+          )}
+          onClick={onClick}
         >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">

@@ -16,7 +16,7 @@ interface EmployeeToolbarProps {
   onToggleExpand: () => void;
   onImport: () => void;
   onExport: () => void;
-  onEmployeeClick?: (employeeId: string) => void;
+  onEmployeeCardClick?: (employeeId: string) => void;
 }
 
 /**
@@ -33,7 +33,7 @@ export function EmployeeToolbar({
   onToggleExpand,
   onImport,
   onExport,
-  onEmployeeClick
+  onEmployeeCardClick
 }: EmployeeToolbarProps) {
   // 过滤员工：只显示未分配的员工（包括请假员工）
   // 过滤并排序员工：未分配的员工中，未请假的排在前面，请假的排在后面
@@ -83,16 +83,16 @@ export function EmployeeToolbar({
             filteredEmployees.map(employee => (
                <div key={employee.id} className="min-w-[80px]">
                  <EmployeeCard 
-                   employee={employee}
-                   onToggleLeave={onToggleLeave}
-                   isDraggable={!employee.isOnLeave}
-                    onDoubleClick={() => {
-                      onSettingsClick && onSettingsClick(employee.id);
-                    }}
-                    onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
-                      showSettingsButton={false}
-                      showStatusButton={true}
-                      onEmployeeClick={onEmployeeClick}
+                     employee={employee}
+                     onToggleLeave={onToggleLeave}
+                      isDraggable={!employee.isOnLeave}
+                      onDoubleClick={() => {
+                        onSettingsClick && onSettingsClick(employee.id);
+                      }}
+                     onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
+                       showSettingsButton={false}
+                        showStatusButton={true}
+                        onClick={onEmployeeCardClick ? () => onEmployeeCardClick(employee.id) : undefined}
                   />
               </div>
            ))

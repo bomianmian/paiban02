@@ -5,6 +5,8 @@ import { WorksiteCard } from './WorksiteCard';
 import { AddButton } from './AddButton';
 
 interface WorksiteListProps {
+  activeWorksiteId?: string | null;
+  onWorksiteClick: (worksiteId: string) => void;
   worksites: Worksite[];
   employees: Employee[];
   onRemoveEmployee: (worksiteId: string, employeeId: string) => void;
@@ -12,8 +14,7 @@ interface WorksiteListProps {
   onAddWorksite: () => void;
   onDeleteWorksite: (worksiteId: string) => void;
   onWorksiteSettings?: (worksiteId: string) => void;
-  activeWorksiteId?: string;
-  onSetActiveWorksite?: (worksiteId: string) => void;
+
 }
 
 /**
@@ -28,7 +29,7 @@ export function WorksiteList({
   onDeleteWorksite,
   onWorksiteSettings,
   activeWorksiteId,
-  onSetActiveWorksite
+  onWorksiteClick
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -67,15 +68,16 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-               <WorksiteCard 
+                 <WorksiteCard 
                  worksite={worksite}
                  employees={employees}
                  onRemoveEmployee={onRemoveEmployee}
                  onAddEmployee={onAddEmployee}
                  onDeleteWorksite={onDeleteWorksite}
-                 onSettingsClick={onWorksiteSettings}
-                 isActive={worksite.id === activeWorksiteId}
-                 onActivate={() => onSetActiveWorksite && onSetActiveWorksite(worksite.id)}
+                 onWorksiteSettings={onWorksiteSettings}
+                 isActive={activeWorksiteId === worksite.id}
+                  isActive={activeWorksiteId === worksite.id}
+                  onClick={() => onWorksiteClick(worksite.id)}
                />
           </div>
         ))}
