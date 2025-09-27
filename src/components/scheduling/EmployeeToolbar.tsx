@@ -16,9 +16,7 @@ interface EmployeeToolbarProps {
   onToggleExpand: () => void;
   onImport: () => void;
   onExport: () => void;
-  isMobile?: boolean;
-  hasActiveWorksite?: boolean;
-  onAddToActiveWorksite?: (employeeId: string) => void;
+  onEmployeeClick?: (employeeId: string) => void;
 }
 
 /**
@@ -34,7 +32,8 @@ export function EmployeeToolbar({
   isExpanded,
   onToggleExpand,
   onImport,
-  onExport
+  onExport,
+  onEmployeeClick
 }: EmployeeToolbarProps) {
   // 过滤员工：只显示未分配的员工（包括请假员工）
   // 过滤并排序员工：未分配的员工中，未请假的排在前面，请假的排在后面
@@ -92,8 +91,9 @@ export function EmployeeToolbar({
                     }}
                     onSettingsClick={() => onSettingsClick && onSettingsClick(employee.id)}
                       showSettingsButton={false}
-                     showStatusButton={true}
-                 />
+                      showStatusButton={true}
+                      onEmployeeClick={onEmployeeClick}
+                  />
               </div>
            ))
           ) : (

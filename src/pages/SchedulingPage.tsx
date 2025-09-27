@@ -21,8 +21,6 @@ export default function SchedulingPage() {
   const [worksites, setWorksites] = useState<Worksite[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const [activeWorksiteId, setActiveWorksiteId] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
@@ -31,37 +29,6 @@ export default function SchedulingPage() {
   const [isNewEmployeeModalOpen, setIsNewEmployeeModalOpen] = useState(false);
   const [isEmployeeToolbarExpanded, setIsEmployeeToolbarExpanded] = useState(true);
   const [isCircularTextVisible, setIsCircularTextVisible] = useState(true);
-  
-  // 检测设备类型并添加响应式监听
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile(); // 初始检查
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // 工地卡片点击处理函数 - 移动端
-  const handleWorksiteClick = (worksiteId: string) => {
-    if (!isMobile) return;
-    
-    // 激活状态切换：点击已激活工地则取消激活，点击未激活工地则激活它
-    setActiveWorksiteId(prevId => 
-      prevId === worksiteId ? null : worksiteId
-    );
-  };
-
-  // 员工卡片点击处理函数 - 移动端
-  const handleEmployeeClick = (employeeId: string) => {
-    if (!isMobile || !activeWorksiteId) return;
-    
-    // 将员工添加到当前激活的工地
-    addEmployeeToWorksite(activeWorksiteId, employeeId);
-  };
-
   // 加载状态管理
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,10 +36,33 @@ export default function SchedulingPage() {
   // 工地设置模态框状态
   const [isWorksiteSettingsModalOpen, setIsWorksiteSettingsModalOpen] = useState(false);
   const [selectedWorksite, setSelectedWorksite] = useState<Worksite | null>(null);
+  // 激活工地状态管理
+  const [activeWorksiteId, setActiveWorksiteId] = useState<string | null>(null);
+  
   // 日期状态管理 - 确保月份始终为当前系统月份
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
+  
+  // 设置激活工地
+  const setActiveWorksite = (worksiteId: string) => {
+    setActiveWorksiteId(worksiteId);
+  };
+  
+  // 清除激活工地
+  const clearActiveWorksite = () => {
+    setActiveWorksiteId(null);
+  };
+  
+  // 添加员工到激活工地
+  const addEmployeeToActiveWorksite = (employeeId: string) => {
+    if (!activeWorksiteId) {
+      toast.info('请先选择一个工地');
+      return;
+    }
+    
+    addEmployeeToWorksite(activeWorksiteId, employeeId);
+  };
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
   
@@ -564,8 +554,10 @@ const closeNewEmployeeModal = () => {
            onAddEmployee={addEmployeeToWorksite}
            onAddWorksite={addNewWorksite}
            onDeleteWorksite={deleteWorksite}
-            onWorksiteSettings={(id) => {
-              const worksite = worksites.find(w => w.id === id);
+             activeWorksiteId={activeWorksiteId}
+             onSetActiveWorksite={setActiveWorksite}
+             onWorksiteSettings={(id) => {
+               const worksite = worksites.find(w => w.id === id);
               if (worksite) openWorksiteSettingsModal(worksite);
             }}
        />
@@ -579,10 +571,10 @@ const closeNewEmployeeModal = () => {
             onDeleteEmployee={deleteEmployee}
             onSettingsClick={navigateToEmployeeEdit}
             isExpanded={isEmployeeToolbarExpanded}
-            onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
-
-         />
-          </div>
+           onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
+          onEmployeeClick={addEmployeeToActiveWorksite}
+          />
+         </div>
 
        {/* 员工信息设置模态框 */}
         {/* 编辑员工模态框 */}

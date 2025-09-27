@@ -12,9 +12,8 @@ interface WorksiteListProps {
   onAddWorksite: () => void;
   onDeleteWorksite: (worksiteId: string) => void;
   onWorksiteSettings?: (worksiteId: string) => void;
-  isMobile?: boolean;
-  activeWorksiteId?: string | null;
-  onWorksiteClick?: (worksiteId: string) => void;
+  activeWorksiteId?: string;
+  onSetActiveWorksite?: (worksiteId: string) => void;
 }
 
 /**
@@ -27,7 +26,9 @@ export function WorksiteList({
   onAddEmployee, 
   onAddWorksite,
   onDeleteWorksite,
-  onWorksiteSettings
+  onWorksiteSettings,
+  activeWorksiteId,
+  onSetActiveWorksite
 }: WorksiteListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicators, setShowScrollIndicators] = useState(false);
@@ -66,14 +67,16 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-              <WorksiteCard 
-                worksite={worksite}
-                employees={employees}
-                onRemoveEmployee={onRemoveEmployee}
-                onAddEmployee={onAddEmployee}
-                onDeleteWorksite={onDeleteWorksite}
-                onSettingsClick={onWorksiteSettings}
-              />
+               <WorksiteCard 
+                 worksite={worksite}
+                 employees={employees}
+                 onRemoveEmployee={onRemoveEmployee}
+                 onAddEmployee={onAddEmployee}
+                 onDeleteWorksite={onDeleteWorksite}
+                 onSettingsClick={onWorksiteSettings}
+                 isActive={worksite.id === activeWorksiteId}
+                 onActivate={() => onSetActiveWorksite && onSetActiveWorksite(worksite.id)}
+               />
           </div>
         ))}
       </div>

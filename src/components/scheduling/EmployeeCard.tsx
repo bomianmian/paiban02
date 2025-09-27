@@ -16,7 +16,7 @@ interface EmployeeCardProps {
   onSettingsClick?: (id: string) => void;
   showSettingsButton?: boolean;
   showStatusButton?: boolean;
-  onClick?: () => void;
+  onEmployeeClick?: (employeeId: string) => void;
 }
 
 /**
@@ -29,7 +29,8 @@ export function EmployeeCard({
   onDoubleClick,
   onSettingsClick,
   showSettingsButton = true,
-  showStatusButton = true
+  showStatusButton = true,
+  onEmployeeClick
 }: EmployeeCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
@@ -209,17 +210,24 @@ export function EmployeeCard({
       ref={cardRef}
       draggable={isDraggable}
       onDoubleClick={onDoubleClick}
-        className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
-          "transition-all duration-200",
-             employee.isOnLeave 
-               ? "bg-[#abd1c6] opacity-60" 
-               : !isDraggable 
-                 ? "bg-[#abd1c6] opacity-70" 
-                 : "bg-[#abd1c6]",
-           isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-           onDoubleClick ? "cursor-pointer" : ""
-        )}
+         className={cn(
+             "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target",
+           "transition-all duration-200",
+              employee.isOnLeave 
+                ? "bg-[#abd1c6] opacity-60" 
+                : !isDraggable 
+                  ? "bg-[#abd1c6] opacity-70" 
+                  : "bg-[#abd1c6]",
+            isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
+            onDoubleClick ? "cursor-pointer" : ""
+         )}
+          onClick={(e) => {
+            // 仅在移动端点击添加员工到激活工地
+            if (typeof window !== 'undefined' && window.innerWidth <= 768 && onEmployeeClick && !employee.isOnLeave) {
+              e.stopPropagation();
+              onEmployeeClick(employee.id);
+            }
+          }}
     >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}
