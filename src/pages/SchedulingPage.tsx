@@ -43,6 +43,8 @@ import ClickSpark from '@/components/ClickSpark';
   const currentYear = today.getFullYear();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  // 设置为当月最后一天的23:59:59，确保时间比较正确
+  lastDayOfMonth.setHours(23, 59, 59, 999);
   
   // 确保初始日期在当前月份内
   const initialDate = today.getMonth() === currentMonth ? today : firstDayOfMonth;
@@ -66,7 +68,7 @@ import ClickSpark from '@/components/ClickSpark';
     setCurrentDate(prev => {
       const newDate = new Date(prev);
       newDate.setDate(newDate.getDate() + 1);
-      // 确保不超过当前月份的最后一天
+      // 确保不超过当前月份的最后一天（只比较日期部分）
       if (newDate > lastDayOfMonth) {
         return prev;
       }
@@ -505,7 +507,7 @@ const closeNewEmployeeModal = () => {
            }`}>
               <div className="flex items-center justify-center px-4 py-2">
                 <div className="flex items-center">
-                   <span className="text-lg font-medium text-[#fffffe]">{formatDisplayDate(currentDate)}</span>
+                    <span className="text-lg font-medium text-[#fffffe]">{format(currentDate, 'yyyy年M月d日', { locale: zhCN })}</span>
                   <span className="text-xl font-bold text-[#fffffe] ml-2">工地排班系统</span>
                   <div className="flex flex-col ml-3">
                     <button 

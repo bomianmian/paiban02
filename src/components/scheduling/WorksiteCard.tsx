@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Worksite, Employee } from "@/mocks/schedulingData";
 import { Building2, X } from "lucide-react";
 import { EmployeeCard } from "./EmployeeCard";
+import { toast } from 'sonner';
 
 interface WorksiteCardProps {
   onClick?: () => void;
@@ -67,7 +68,9 @@ export function WorksiteCard(
 
   // 处理放置
   const handleDrop = (e: DragEvent | CustomEvent) => {
-    e.preventDefault();
+    if ('preventDefault' in e) {
+      e.preventDefault();
+    }
     setIsOver(false);
     
     let employeeId = '';
@@ -81,16 +84,8 @@ export function WorksiteCard(
       employeeId = (e as CustomEvent).detail.employeeId;
     }
 
-    if (employeeId && !worksite.scheduledEmployees.includes(employeeId)) {
+        if (employeeId && !worksite.scheduledEmployees.includes(employeeId)) {
       onAddEmployee(worksite.id, employeeId);
-      
-      // 显示成功提示
-      const event = new CustomEvent('drop-success', {
-        bubbles: true
-      });
-      if (dropZoneRef.current) {
-        dropZoneRef.current.dispatchEvent(event);
-      }
     }
   };
 
@@ -140,10 +135,14 @@ export function WorksiteCard(
     dropZone.setAttribute('data-worksite-id', worksite.id);
     dropZone.classList.add('worksite-card');
 
-    // 鼠标拖放事件
-    dropZone.addEventListener("dragover", handleDragOver as (e: DragEvent) => void);
+     // 鼠标拖放事件
+    const dragOverHandler = handleDragOver as (e: DragEvent) => void;
+    const dropHandler = handleDrop as (e: DragEvent) => void;
+    const simulatedDropHandler = handleDrop as (e: CustomEvent) => void;
+    
+    dropZone.addEventListener("dragover", dragOverHandler);
     dropZone.addEventListener("dragleave", handleDragLeave);
-    dropZone.addEventListener("drop", handleDrop as (e: DragEvent) => void);
+    dropZone.addEventListener("drop", dropHandler);
     
     // 触摸事件支持
     dropZone.addEventListener("touchmove", handleTouchMove);
@@ -151,16 +150,16 @@ export function WorksiteCard(
     dropZone.addEventListener("touchcancel", handleTouchEnd);
     
     // 监听自定义的模拟拖放事件
-    document.addEventListener('simulated-drop', handleDrop as (e: CustomEvent) => void);
+    document.addEventListener('simulated-drop', simulatedDropHandler);
 
      return () => {
-      dropZone.removeEventListener("dragover", handleDragOver as (e: DragEvent) => void);
+      dropZone.removeEventListener("dragover", dragOverHandler);
       dropZone.removeEventListener("dragleave", handleDragLeave);
-      dropZone.removeEventListener("drop", handleDrop as (e: DragEvent) => void);
+      dropZone.removeEventListener("drop", dropHandler);
       dropZone.removeEventListener("touchmove", handleTouchMove);
       dropZone.removeEventListener("touchend", handleTouchEnd);
       dropZone.removeEventListener("touchcancel", handleTouchEnd);
-      document.removeEventListener('simulated-drop', handleDrop as (e: CustomEvent) => void);
+      document.removeEventListener('simulated-drop', simulatedDropHandler);
       
       // 清理视觉效果
       dropZone.classList.remove('scale-[1.02]', 'shadow-md');
@@ -217,14 +216,14 @@ export function WorksiteCard(
                             <EmployeeCard
                                 employee={employee}
                                 onToggleLeave={toggleEmployeeLeave}
-                                isDraggable={false}
+                                isDraggable={true}
                                 showSettingsButton={false}
                                 showStatusButton={false}
                                 onDoubleClick={(e) => {
                                     e.stopPropagation();
                                     removeEmployee(employee.id);
                                 }}
-                                onClick={(e) => e.stopPropagation()} />
+                                onClick={(id, e) => e.stopPropagation()} />
                         </div>
                     )
                 ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">
@@ -237,7 +236,7 @@ export function WorksiteCard(
             {/* 左下角设置按钮 */}
             <button
                 onClick={() => onSettingsClick && onSettingsClick(worksite.id)}
-                className="absolute bottom-2 left-2 text-gray-400 hover:text-blue-500 transition-colors p-2"
+                className="absolute bottom-2 left-2 text-gray-400 hover:text-blue-500 transition-colors p-3"
                 aria-label="工地设置">
                 <i className="fa-solid fa-cog"></i>
             </button>
@@ -249,7 +248,7 @@ export function WorksiteCard(
                         onDeleteWorksite(worksite.id);
                     }
                 }}
-                className="absolute bottom-2 right-2 text-gray-400 hover:text-red-500 transition-colors p-2"
+                className="absolute bottom-2 right-2 text-gray-400 hover:text-red-500 transition-colors p-3"
                 aria-label="删除工地">
                 <i className="fa-solid fa-trash-can"></i>
             </button>

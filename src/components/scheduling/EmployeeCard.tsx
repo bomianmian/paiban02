@@ -12,7 +12,7 @@ interface EmployeeCardProps {
   employee: Employee;
   onToggleLeave: (id: string) => void;
   isDraggable?: boolean;
-  onDoubleClick?: () => void;
+  onDoubleClick?: (e: React.MouseEvent) => void;
   onSettingsClick?: (id: string) => void;
   showSettingsButton?: boolean;
   showStatusButton?: boolean;
@@ -40,7 +40,7 @@ export function EmployeeCard({
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   // 处理拖拽开始
-  const handleDragStart = (e: DragEvent | TouchEvent) => {
+  const handleDragStart = (e: React.DragEvent | React.TouchEvent) => {
     if (!cardRef.current || !isDraggable || employee.isOnLeave) return;
     
     const element = cardRef.current;
@@ -52,7 +52,7 @@ export function EmployeeCard({
     // 设置拖拽数据
     if ('dataTransfer' in e) {
       // 鼠标拖拽
-      (e as DragEvent).dataTransfer.setData('text/plain', employee.id);
+      e.dataTransfer.setData('text/plain', employee.id);
     } else if ('touches' in e) {
       // 触摸拖拽 - 记录初始位置
       const touch = e.touches[0];
@@ -216,9 +216,12 @@ export function EmployeeCard({
        <div
         ref={cardRef}
         draggable={isDraggable}
-           onDoubleClick={onDoubleClick}
-           onClick={onClick ? () => onClick(employee.id) : undefined}
-           onTouchEnd={onClick ? () => onClick(employee.id) : undefined}
+            onDoubleClick={(e) => onDoubleClick && onDoubleClick(e)}
+            onClick={onClick ? (e) => onClick(employee.id, e) : undefined}
+            onTouchEnd={onClick ? (e) => {
+              e.stopPropagation();
+              onClick(employee.id);
+            } : undefined}
            className={cn(
             "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target employee-card touch-manipulation",
           "transition-all duration-200",
