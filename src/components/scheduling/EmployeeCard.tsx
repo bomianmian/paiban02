@@ -216,8 +216,9 @@ export function EmployeeCard({
        <div
         ref={cardRef}
         draggable={isDraggable}
-          onDoubleClick={onDoubleClick}
-          onClick={onClick ? () => onClick(employee.id) : undefined}
+           onDoubleClick={onDoubleClick}
+           onClick={onClick ? () => onClick(employee.id) : undefined}
+           onTouchEnd={onClick ? () => onClick(employee.id) : undefined}
            className={cn(
             "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target employee-card touch-manipulation",
           "transition-all duration-200",

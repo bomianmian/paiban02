@@ -530,10 +530,10 @@ const closeNewEmployeeModal = () => {
               const worksite = worksites.find(w => w.id === id);
               if (worksite) openWorksiteSettingsModal(worksite);
             }}
-                onWorksiteClick={(worksiteId) => {
+                 onWorksiteClick={(worksiteId) => {
                   // 处理工地卡片点击事件
                   console.log("Worksite clicked:", worksiteId);
-                  setActiveWorksiteId(worksiteId);
+                  setActiveWorksiteId(prev => prev === worksiteId ? null : worksiteId);
              }}
             activeWorksiteId={activeWorksiteId}
           />
@@ -546,53 +546,45 @@ const closeNewEmployeeModal = () => {
              assignedEmployeeIds={assignedEmployeeIds}
              onDeleteEmployee={deleteEmployee}
              onSettingsClick={navigateToEmployeeEdit}
-               onEmployeeCardClick={(employeeId) => {
-                 // 确保有激活的工地
-                 if (!activeWorksiteId) {
-                   toast.error('请先点击选择一个工地');
-                   return;
-                 }
-                 
-                 // 验证员工ID
-                 if (!employeeId) {
-                   toast.error('未找到员工信息');
-                   return;
-                 }
-                 
-                 // 查找工地和员工
-                 const worksite = worksites.find(w => w.id === activeWorksiteId);
-                 const employee = employees.find(e => e.id === employeeId);
-                 
-                 // 验证工地存在
-                 if (!worksite) {
-                   toast.error('所选工地不存在');
-                   setActiveWorksiteId(null); // 重置激活状态
-                   return;
-                 }
-                 
-                 // 验证员工存在
-                 if (!employee) {
-                   toast.error('未找到员工信息');
-                   return;
-                 }
-                 
-                 // 检查员工是否在休假
-                 if (employee.isOnLeave) {
-                   toast.error(`${employee.name}正在休假，无法分配`);
-                   return;
-                 }
-                 
-                 // 检查员工是否已分配到该工地
-                 if (worksite.scheduledEmployees.includes(employeeId)) {
-                   toast.error(`${employee.name}已在该工地`);
-                   return;
-                 }
-                 
-                 // 执行添加操作
-                 addEmployeeToWorksite(activeWorksiteId, employeeId);
-                  // 提供明确的成功反馈（根据需求移除弹窗通知）
-                  // toast.success(`${employee.name}已添加到${worksite.name}`);
-               }}
+                onEmployeeCardClick={(employeeId) => {
+                  // 确保有激活的工地
+                  if (!activeWorksiteId) {
+                    // 添加视觉反馈，即使没有toast
+                    const worksiteCards = document.querySelectorAll('.worksite-card');
+                    worksiteCards.forEach(card => {
+                      card.classList.add('animate-pulse');
+                      setTimeout(() => card.classList.remove('animate-pulse'), 1000);
+                    });
+                    return;
+                  }
+                  
+                  // 验证员工ID
+                  if (!employeeId) return;
+                  
+                  // 查找工地和员工
+                  const worksite = worksites.find(w => w.id === activeWorksiteId);
+                  const employee = employees.find(e => e.id === employeeId);
+                  
+                  // 验证工地和员工存在且员工未休假
+                  if (!worksite || !employee || employee.isOnLeave) return;
+                  
+                  // 检查员工是否已分配到该工地
+                  if (worksite.scheduledEmployees.includes(employeeId)) return;
+                  
+                  // 执行添加操作 - 使用setTimeout确保状态更新
+                  setTimeout(() => {
+                    addEmployeeToWorksite(activeWorksiteId, employeeId);
+                    
+                    // 添加视觉反馈
+                    const worksiteElement = document.querySelector(`[data-worksite-id="${activeWorksiteId}"]`);
+                    if (worksiteElement) {
+                      worksiteElement.classList.add('ring-4', 'ring-green-500');
+                      setTimeout(() => {
+                        worksiteElement.classList.remove('ring-4', 'ring-green-500');
+                      }, 500);
+                    }
+                  }, 100);
+                }}
             isExpanded={isEmployeeToolbarExpanded}
              onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
          />
