@@ -35,6 +35,8 @@ export function EmployeeCard({
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
   const [touchOffset, setTouchOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+  const [lastTapTime, setLastTapTime] = useState(0);
+  const [tapCount, setTapCount] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const dragThreshold = 5; // 5px的移动阈值来区分点击和拖拽
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -144,6 +146,7 @@ export function EmployeeCard({
       handleDragStart(e);
     };
     
+     // 添加双击检测
     const handleTouchEnd = (e: TouchEvent) => {
       const wasDragging = isDragging;
       
@@ -169,11 +172,36 @@ export function EmployeeCard({
             element.dispatchEvent(event);
           }
         }
-      }
-      
-      // 如果不是拖拽操作且有点击回调，触发点击事件
-      if (!wasDragging && onClick) {
-        onClick(employee.id);
+      } else {
+        // 双击检测逻辑
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        
+        if (tapLength < 300 && tapLength > 0) {
+          // 双击事件
+          setTapCount(0);
+          setLastTapTime(0);
+          if (onDoubleClick) {
+            onDoubleClick(e as unknown as React.MouseEvent);
+          }
+        } else {
+          // 单击事件
+          setTapCount(tapCount + 1);
+          setLastTapTime(currentTime);
+          
+          // 如果不是拖拽操作且有点击回调，触发点击事件
+          if (onClick) {
+            onClick(employee.id);
+          }
+          
+          // 重置计数器
+          setTimeout(() => {
+            if (tapCount === 1) {
+              setTapCount(0);
+              setLastTapTime(0);
+            }
+          }, 300);
+        }
       }
     };
     

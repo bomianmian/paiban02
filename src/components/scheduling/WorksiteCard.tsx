@@ -219,8 +219,9 @@ export function WorksiteCard(
                                 isDraggable={true}
                                 showSettingsButton={false}
                                 showStatusButton={false}
-                                onDoubleClick={(e) => {
+                                 onDoubleClick={(e) => {
                                     e.stopPropagation();
+                                    // 确保移除员工的逻辑在移动设备上也能正常工作
                                     removeEmployee(employee.id);
                                 }}
                                 onClick={(id, e) => e.stopPropagation()} />
