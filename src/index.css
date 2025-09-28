@@ -24,31 +24,7 @@
   scrollbar-width: none;
 }
 
-/* 员工列表滚动条样式 - 仅在移动设备上显示 */
-@media (max-width: 768px) {
-  .employee-scroll-container {
-    scrollbar-width: auto;
-  }
-  
-  .employee-scroll-container::-webkit-scrollbar {
-    display: block;
-    height: 8px;
-  }
-  
-  .employee-scroll-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  .employee-scroll-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-  }
-  
-  .employee-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-}
+<!-- 员工列表滚动条已按用户要求隐藏 -->
 
 /* 加载动画样式 */
 .loader-wrapper{
