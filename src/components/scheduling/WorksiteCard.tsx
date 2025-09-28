@@ -217,10 +217,14 @@ export function WorksiteCard(
                             <EmployeeCard
                                 employee={employee}
                                 onToggleLeave={toggleEmployeeLeave}
-                                isDraggable={true}
+                                isDraggable={false}
                                 showSettingsButton={false}
                                 showStatusButton={false}
-                                onDoubleClick={() => removeEmployee(employee.id)} />
+                                onDoubleClick={(e) => {
+                                    e.stopPropagation();
+                                    removeEmployee(employee.id);
+                                }}
+                                onClick={(e) => e.stopPropagation()} />
                         </div>
                     )
                 ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">
