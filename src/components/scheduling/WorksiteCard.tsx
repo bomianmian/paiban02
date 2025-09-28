@@ -210,10 +210,10 @@ export function WorksiteCard(
             
             {/* 员工卡片区域 - 位于标题下方 */}
              <div className="flex items-center justify-center space-x-1 overflow-x-hidden scrollbar-hide pb-2 w-full relative z-10">
-                {scheduledEmployees.length > 0 ? scheduledEmployees.map(
-                     employee => (
-                        <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-1 rounded-lg min-w-[34px] flex-shrink-0 border border-white/30">
-                            <EmployeeCard
+                 {scheduledEmployees.length > 0 ? scheduledEmployees.map(
+                      employee => (
+                         <div key={employee.id} className="bg-white/70 backdrop-blur-sm p-0 rounded-lg min-w-[24px] flex-shrink-0 -ml-0.5 -mr-0.5">
+                             <EmployeeCard
                                 employee={employee}
                                 onToggleLeave={toggleEmployeeLeave}
                                 isDraggable={true}
