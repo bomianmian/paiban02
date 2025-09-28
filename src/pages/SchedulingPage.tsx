@@ -530,10 +530,10 @@ const closeNewEmployeeModal = () => {
               const worksite = worksites.find(w => w.id === id);
               if (worksite) openWorksiteSettingsModal(worksite);
             }}
-                 onWorksiteClick={(worksiteId) => {
+                  onWorksiteClick={(worksiteId) => {
                   // 处理工地卡片点击事件
                   console.log("Worksite clicked:", worksiteId);
-                  setActiveWorksiteId(prev => prev === worksiteId ? null : worksiteId);
+                  setActiveWorksiteId(worksiteId);
              }}
             activeWorksiteId={activeWorksiteId}
           />

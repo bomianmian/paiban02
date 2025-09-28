@@ -175,18 +175,18 @@ export function WorksiteCard(
         console.log(`Toggle leave status for employee ${employeeId}`);
     };
 
-    return (
+     return (
      <div 
                 ref={dropZoneRef}
-                onClick={onClick}
             className={cn(
               "relative",
               "w-full h-auto min-h-[130px] bg-white rounded-none shadow-md py-0 px-4 flex flex-col items-center hover:shadow-lg transition-all duration-300 relative touch-manipulation cursor-pointer",
               isOver ? "bg-blue-50 shadow-lg" : "",
               isActive ? "ring-4 ring-yellow-400 z-10 bg-yellow-50 scale-105" : ""
             )}
-            onClick={onClick}
-            onTouchEnd={onClick}
+            onClick={() => onClick && onClick()}
+            onTouchStart={() => onClick && onClick()}
+            style={{ touchAction: 'manipulation' }}
         >
             {/* 进度条背景 */}
              <div className="absolute inset-0 overflow-hidden rounded-none">
