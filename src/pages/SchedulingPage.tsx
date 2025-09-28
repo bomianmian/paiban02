@@ -547,9 +547,31 @@ const closeNewEmployeeModal = () => {
              onDeleteEmployee={deleteEmployee}
              onSettingsClick={navigateToEmployeeEdit}
               onEmployeeCardClick={(employeeId) => {
-                if (employeeId && activeWorksiteId) {
-                  addEmployeeToWorksite(activeWorksiteId, employeeId);
+                if (!activeWorksiteId) {
+                  toast.error('请先选择一个工地');
+                  return;
                 }
+                
+                if (!employeeId) {
+                  toast.error('未找到员工信息');
+                  return;
+                }
+                
+                const worksite = worksites.find(w => w.id === activeWorksiteId);
+                const employee = employees.find(e => e.id === employeeId);
+                
+                if (!worksite) {
+                  toast.error('所选工地不存在');
+                  return;
+                }
+                
+                if (!employee) {
+                  toast.error('所选员工不存在');
+                  return;
+                }
+                
+                addEmployeeToWorksite(activeWorksiteId, employeeId);
+                toast.success(`${employee.name}已添加到${worksite.name}`);
               }}
             isExpanded={isEmployeeToolbarExpanded}
              onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
