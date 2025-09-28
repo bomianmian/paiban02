@@ -352,6 +352,20 @@ const closeNewEmployeeModal = () => {
       closeWorksiteSettingsModal();
     };
 
+       // 点击空白区域处理函数
+      const handleBlankAreaClick = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        
+        // 检查点击目标是否为空白区域（不是工地卡片、员工卡片或按钮）
+        if (!target.closest('.worksite-card') && 
+            !target.closest('.employee-card') && 
+            !target.closest('button') &&
+            !target.closest('.employee-scroll-container') &&
+            !target.closest('.employee-toolbar')) {
+          setActiveWorksiteId(null);
+        }
+      };
+
       // 处理完成按钮点击，提交排班数据到飞书多维格
       const handleComplete = async () => {
         setIsSubmitting(true);
@@ -445,7 +459,11 @@ const closeNewEmployeeModal = () => {
    
     return (
 
-         <div className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}>
+          <div 
+            className="min-h-screen pt-16 pb-40 relative px-2 overflow-x-hidden" 
+            style={{ backgroundColor: '#abd1c6', maxWidth: '100vw' }}
+            onClick={handleBlankAreaClick}
+          >
         {/* 圆形文字背景 - 成功提交后隐藏 */}
          {/* 加载状态覆盖层 */}
          <FullScreenLoading 
@@ -575,14 +593,7 @@ const closeNewEmployeeModal = () => {
                   setTimeout(() => {
                     addEmployeeToWorksite(activeWorksiteId, employeeId);
                     
-                    // 添加视觉反馈
-                    const worksiteElement = document.querySelector(`[data-worksite-id="${activeWorksiteId}"]`);
-                    if (worksiteElement) {
-                      worksiteElement.classList.add('ring-4', 'ring-green-500');
-                      setTimeout(() => {
-                        worksiteElement.classList.remove('ring-4', 'ring-green-500');
-                      }, 500);
-                    }
+
                   }, 100);
                 }}
             isExpanded={isEmployeeToolbarExpanded}

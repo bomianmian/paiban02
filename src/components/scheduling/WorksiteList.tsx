@@ -68,14 +68,14 @@ export function WorksiteList({
              key={worksite.id} 
              className="w-full"
            >
-                 <WorksiteCard 
-                 worksite={worksite}
-                 employees={employees}
-                 onRemoveEmployee={onRemoveEmployee}
-                 onAddEmployee={onAddEmployee}
-                 onDeleteWorksite={onDeleteWorksite}
-                 onWorksiteSettings={onWorksiteSettings}
-                 isActive={activeWorksiteId === worksite.id}
+                  <WorksiteCard 
+                  worksite={worksite}
+                  employees={employees}
+                  onRemoveEmployee={onRemoveEmployee}
+                  onAddEmployee={onAddEmployee}
+                  onDeleteWorksite={onDeleteWorksite}
+                  onSettingsClick={onWorksiteSettings}
+                  isActive={activeWorksiteId === worksite.id}
                   isActive={activeWorksiteId === worksite.id}
                   onClick={() => onWorksiteClick(worksite.id)}
                />
