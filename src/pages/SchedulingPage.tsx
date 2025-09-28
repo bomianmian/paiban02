@@ -530,11 +530,11 @@ const closeNewEmployeeModal = () => {
               const worksite = worksites.find(w => w.id === id);
               if (worksite) openWorksiteSettingsModal(worksite);
             }}
-            onWorksiteClick={(worksiteId) => {
-              // 处理工地卡片点击事件
-              console.log("Worksite clicked:", worksiteId);
-              setActiveWorksiteId(worksiteId);
-            }}
+                onWorksiteClick={(worksiteId) => {
+                  // 处理工地卡片点击事件
+                  console.log("Worksite clicked:", worksiteId);
+                  setActiveWorksiteId(worksiteId);
+             }}
             activeWorksiteId={activeWorksiteId}
           />
        
@@ -546,33 +546,53 @@ const closeNewEmployeeModal = () => {
              assignedEmployeeIds={assignedEmployeeIds}
              onDeleteEmployee={deleteEmployee}
              onSettingsClick={navigateToEmployeeEdit}
-              onEmployeeCardClick={(employeeId) => {
-                if (!activeWorksiteId) {
-                  toast.error('请先选择一个工地');
-                  return;
-                }
-                
-                if (!employeeId) {
-                  toast.error('未找到员工信息');
-                  return;
-                }
-                
-                const worksite = worksites.find(w => w.id === activeWorksiteId);
-                const employee = employees.find(e => e.id === employeeId);
-                
-                if (!worksite) {
-                  toast.error('所选工地不存在');
-                  return;
-                }
-                
-                if (!employee) {
-                  toast.error('所选员工不存在');
-                  return;
-                }
-                
-                addEmployeeToWorksite(activeWorksiteId, employeeId);
-                toast.success(`${employee.name}已添加到${worksite.name}`);
-              }}
+               onEmployeeCardClick={(employeeId) => {
+                 // 确保有激活的工地
+                 if (!activeWorksiteId) {
+                   toast.error('请先点击选择一个工地');
+                   return;
+                 }
+                 
+                 // 验证员工ID
+                 if (!employeeId) {
+                   toast.error('未找到员工信息');
+                   return;
+                 }
+                 
+                 // 查找工地和员工
+                 const worksite = worksites.find(w => w.id === activeWorksiteId);
+                 const employee = employees.find(e => e.id === employeeId);
+                 
+                 // 验证工地存在
+                 if (!worksite) {
+                   toast.error('所选工地不存在');
+                   setActiveWorksiteId(null); // 重置激活状态
+                   return;
+                 }
+                 
+                 // 验证员工存在
+                 if (!employee) {
+                   toast.error('未找到员工信息');
+                   return;
+                 }
+                 
+                 // 检查员工是否在休假
+                 if (employee.isOnLeave) {
+                   toast.error(`${employee.name}正在休假，无法分配`);
+                   return;
+                 }
+                 
+                 // 检查员工是否已分配到该工地
+                 if (worksite.scheduledEmployees.includes(employeeId)) {
+                   toast.error(`${employee.name}已在该工地`);
+                   return;
+                 }
+                 
+                 // 执行添加操作
+                 addEmployeeToWorksite(activeWorksiteId, employeeId);
+                  // 提供明确的成功反馈（根据需求移除弹窗通知）
+                  // toast.success(`${employee.name}已添加到${worksite.name}`);
+               }}
             isExpanded={isEmployeeToolbarExpanded}
              onToggleExpand={() => setIsEmployeeToolbarExpanded(!isEmployeeToolbarExpanded)}
          />

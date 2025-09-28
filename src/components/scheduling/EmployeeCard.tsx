@@ -133,7 +133,7 @@ export function EmployeeCard({
     element.addEventListener('dragend', handleDragEnd);
     
     // 触摸事件支持
-    const handleTouchStart = (e: TouchEvent) => {
+     const handleTouchStart = (e: TouchEvent) => {
       // 记录初始触摸位置
       setTouchStartPosition({
         x: e.touches[0].clientX,
@@ -145,28 +145,35 @@ export function EmployeeCard({
     };
     
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!isDragging) return;
+      const wasDragging = isDragging;
       
-      handleDragEnd();
-      
-      // 尝试找到触摸结束位置下的工地卡片
-      const touch = e.changedTouches[0];
-      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-      const worksiteCard = dropTarget?.closest('.worksite-card');
-      
-      if (worksiteCard) {
-        const worksiteId = worksiteCard.getAttribute('data-worksite-id');
-        if (worksiteId) {
-          // 模拟拖放完成
-          const event = new CustomEvent('simulated-drop', {
-            detail: {
-              worksiteId,
-              employeeId: employee.id
-            },
-            bubbles: true
-          });
-          element.dispatchEvent(event);
+      if (isDragging) {
+        handleDragEnd();
+        
+        // 尝试找到触摸结束位置下的工地卡片
+        const touch = e.changedTouches[0];
+        const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+        const worksiteCard = dropTarget?.closest('.worksite-card');
+        
+        if (worksiteCard) {
+          const worksiteId = worksiteCard.getAttribute('data-worksite-id');
+          if (worksiteId) {
+            // 模拟拖放完成
+            const event = new CustomEvent('simulated-drop', {
+              detail: {
+                worksiteId,
+                employeeId: employee.id
+              },
+              bubbles: true
+            });
+            element.dispatchEvent(event);
+          }
         }
+      }
+      
+      // 如果不是拖拽操作且有点击回调，触发点击事件
+      if (!wasDragging && onClick) {
+        onClick(employee.id);
       }
     };
     
@@ -212,15 +219,15 @@ export function EmployeeCard({
           onDoubleClick={onDoubleClick}
           onClick={onClick ? () => onClick(employee.id) : undefined}
            className={cn(
-              "flex flex-col items-center justify-center p-2 rounded-none cursor-move min-w-[48px] cursor-target employee-card",
-            "transition-all duration-200",
-               employee.isOnLeave 
-                 ? "bg-[#abd1c6] opacity-60" 
-                 : !isDraggable 
-                   ? "bg-[#abd1c6] opacity-70" 
-                   : "bg-[#abd1c6]",
-             isDragging ? "opacity-80 scale-95" : "shadow-sm hover:shadow-md",
-             onDoubleClick ? "cursor-pointer" : ""
+            "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target employee-card touch-manipulation",
+          "transition-all duration-200",
+           employee.isOnLeave 
+             ? "bg-[#abd1c6] opacity-60" 
+             : !isDraggable 
+               ? "bg-[#abd1c6] opacity-70" 
+               : "bg-[#abd1c6]",
+         isDragging ? "opacity-80 scale-95 cursor-move" : "shadow-sm hover:shadow-md cursor-pointer",
+         onDoubleClick ? "cursor-pointer" : ""
           )}
       >
          {/* 员工头像与姓名组合 */}
