@@ -27,12 +27,12 @@
 /* 员工列表滚动条样式 - 仅在移动设备上显示 */
 @media (max-width: 768px) {
   .employee-scroll-container {
-    scrollbar-width: thin;
+    scrollbar-width: auto;
   }
   
   .employee-scroll-container::-webkit-scrollbar {
     display: block;
-    height: 4px;
+    height: 8px;
   }
   
   .employee-scroll-container::-webkit-scrollbar-track {
