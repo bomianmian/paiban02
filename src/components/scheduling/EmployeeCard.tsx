@@ -37,6 +37,8 @@ export function EmployeeCard({
   const [touchOffset, setTouchOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
   const dragThreshold = 5; // 5px的移动阈值来区分点击和拖拽
+  const lastTapTime = useRef(0);
+  const doubleTapThreshold = 300; // 双击的时间阈值（毫秒）
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   // 处理拖拽开始
@@ -133,49 +135,68 @@ export function EmployeeCard({
     element.addEventListener('dragend', handleDragEnd);
     
     // 触摸事件支持
-     const handleTouchStart = (e: TouchEvent) => {
-      // 记录初始触摸位置
-      setTouchStartPosition({
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY
-      });
-      
-      // 立即开始拖拽检测
-      handleDragStart(e);
-    };
+      const handleTouchStart = (e: TouchEvent) => {
+       // 记录初始触摸位置
+       setTouchStartPosition({
+         x: e.touches[0].clientX,
+         y: e.touches[0].clientY
+       });
+       
+       // 检测是否是双击操作
+       const currentTime = Date.now();
+       const timeSinceLastTap = currentTime - lastTapTime.current;
+       
+       if (timeSinceLastTap < doubleTapThreshold && onDoubleClick) {
+         // 是双击，执行双击回调
+         e.preventDefault();
+         onDoubleClick(e);
+       } else {
+         // 不是双击，记录触摸时间
+         lastTapTime.current = currentTime;
+         // 开始拖拽检测
+         handleDragStart(e);
+       }
+     };
     
-    const handleTouchEnd = (e: TouchEvent) => {
-      const wasDragging = isDragging;
-      
-      if (isDragging) {
-        handleDragEnd();
-        
-        // 尝试找到触摸结束位置下的工地卡片
-        const touch = e.changedTouches[0];
-        const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-        const worksiteCard = dropTarget?.closest('.worksite-card');
-        
-        if (worksiteCard) {
-          const worksiteId = worksiteCard.getAttribute('data-worksite-id');
-          if (worksiteId) {
-            // 模拟拖放完成
-            const event = new CustomEvent('simulated-drop', {
-              detail: {
-                worksiteId,
-                employeeId: employee.id
-              },
-              bubbles: true
-            });
-            element.dispatchEvent(event);
-          }
-        }
-      }
-      
-      // 如果不是拖拽操作且有点击回调，触发点击事件
-      if (!wasDragging && onClick) {
-        onClick(employee.id);
-      }
-    };
+     const handleTouchEnd = (e: TouchEvent) => {
+       const wasDragging = isDragging;
+       
+       if (isDragging) {
+         handleDragEnd();
+         
+         // 检查是否是双击操作
+         const currentTime = Date.now();
+         const timeSinceLastTap = currentTime - lastTapTime.current;
+         
+         // 如果不是双击，才执行拖放逻辑
+         if (timeSinceLastTap > doubleTapThreshold) {
+           // 尝试找到触摸结束位置下的工地卡片
+           const touch = e.changedTouches[0];
+           const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+           const worksiteCard = dropTarget?.closest('.worksite-card');
+           
+           if (worksiteCard) {
+             const worksiteId = worksiteCard.getAttribute('data-worksite-id');
+             if (worksiteId) {
+               // 模拟拖放完成
+               const event = new CustomEvent('simulated-drop', {
+                 detail: {
+                   worksiteId,
+                   employeeId: employee.id
+                 },
+                 bubbles: true
+               });
+               element.dispatchEvent(event);
+             }
+           }
+         }
+       }
+       
+       // 如果不是拖拽操作且有点击回调，触发点击事件
+       if (!wasDragging && onClick) {
+         onClick(employee.id);
+       }
+     };
     
     const handleTouchCancel = () => {
       if (isDragging) {
@@ -213,27 +234,33 @@ export function EmployeeCard({
 
 
       return (
-       <div
-        ref={cardRef}
-        draggable={isDraggable}
-            onDoubleClick={(e) => onDoubleClick && onDoubleClick(e)}
-            onClick={onClick ? (e) => onClick(employee.id, e) : undefined}
-            onTouchEnd={onClick ? (e) => {
-              e.stopPropagation();
-              onClick(employee.id);
-            } : undefined}
-           className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target employee-card touch-manipulation",
-          "transition-all duration-200",
-           employee.isOnLeave 
-             ? "bg-[#abd1c6] opacity-60" 
-             : !isDraggable 
-               ? "bg-[#abd1c6] opacity-70" 
-               : "bg-[#abd1c6]",
-         isDragging ? "opacity-80 scale-95 cursor-move" : "shadow-sm hover:shadow-md cursor-pointer",
-         onDoubleClick ? "cursor-pointer" : ""
-          )}
-      >
+        <div
+         ref={cardRef}
+         draggable={isDraggable}
+             onDoubleClick={(e) => {
+               e.stopPropagation();
+               if (onDoubleClick) onDoubleClick(e);
+             }}
+             onClick={onClick ? (e) => {
+               e.stopPropagation();
+               onClick(employee.id, e);
+             } : undefined}
+             onTouchEnd={onClick ? (e) => {
+               e.stopPropagation();
+               onClick(employee.id);
+             } : undefined}
+            className={cn(
+             "flex flex-col items-center justify-center p-2 rounded-none min-w-[48px] cursor-target employee-card touch-manipulation",
+           "transition-all duration-200",
+            employee.isOnLeave 
+              ? "bg-[#abd1c6] opacity-60" 
+              : !isDraggable 
+                ? "bg-[#abd1c6] opacity-70" 
+                : "bg-[#abd1c6]",
+          isDragging ? "opacity-80 scale-95 cursor-move" : "shadow-sm hover:shadow-md cursor-pointer",
+          onDoubleClick ? "cursor-pointer" : ""
+           )}
+       >
          {/* 员工头像与姓名组合 */}
          {/* 评分头像 - 外层灰色背景，包含居中姓名 */}
            <div className={cn(
