@@ -219,12 +219,12 @@ export function WorksiteCard(
                                 isDraggable={true}
                                 showSettingsButton={false}
                                 showStatusButton={false}
-                                 onDoubleClick={(e) => {
-                                    e.stopPropagation();
-                                    // 确保移除员工的逻辑在移动设备上也能正常工作
-                                    removeEmployee(employee.id);
-                                }}
-                                onClick={(id, e) => e.stopPropagation()} />
+                        onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            // 直接调用removeEmployee函数，确保员工被放回员工列表
+                            removeEmployee(employee.id);
+                        }}
+                        onClick={(id, e) => e.stopPropagation()} />
                         </div>
                     )
                 ) : <div className="text-center text-gray-600 text-sm whitespace-nowrap px-2 relative z-10">

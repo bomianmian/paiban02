@@ -4,7 +4,6 @@ import { Employee } from '@/mocks/schedulingData';
 import { User } from 'lucide-react';
 
 
-
 /**
  * 员工卡片组件 - 显示员工信息，支持拖拽和休假状态切换
  */
@@ -35,9 +34,8 @@ export function EmployeeCard({
   const [isDragging, setIsDragging] = useState(false);
   const [touchStartPosition, setTouchStartPosition] = useState<{ x: number, y: number } | null>(null);
   const [touchOffset, setTouchOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
-  const [lastTapTime, setLastTapTime] = useState(0);
-  const [tapCount, setTapCount] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
+  const touchStartTimeoutRef = useRef<number | null>(null);
   const dragThreshold = 5; // 5px的移动阈值来区分点击和拖拽
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
@@ -134,21 +132,29 @@ export function EmployeeCard({
     element.addEventListener('dragstart', handleDragStart as (e: DragEvent) => void);
     element.addEventListener('dragend', handleDragEnd);
     
-    // 触摸事件支持
-     const handleTouchStart = (e: TouchEvent) => {
+  // 触摸事件支持
+      const handleTouchStart = (e: TouchEvent) => {
       // 记录初始触摸位置
       setTouchStartPosition({
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
       });
       
-      // 立即开始拖拽检测
-      handleDragStart(e);
+      // 使用setTimeout延迟开始拖拽，以便区分点击和拖拽
+      touchStartTimeoutRef.current = setTimeout(() => {
+        // 开始拖拽检测
+        handleDragStart(e);
+      }, 150); // 150ms的延迟，区分点击和拖拽
     };
     
-     // 添加双击检测
     const handleTouchEnd = (e: TouchEvent) => {
       const wasDragging = isDragging;
+      
+      // 清除触摸开始的定时器，防止误触发拖拽
+      if (touchStartTimeoutRef.current) {
+        clearTimeout(touchStartTimeoutRef.current);
+        touchStartTimeoutRef.current = null;
+      }
       
       if (isDragging) {
         handleDragEnd();
@@ -172,40 +178,21 @@ export function EmployeeCard({
             element.dispatchEvent(event);
           }
         }
-      } else {
-        // 双击检测逻辑
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTapTime;
-        
-        if (tapLength < 300 && tapLength > 0) {
-          // 双击事件
-          setTapCount(0);
-          setLastTapTime(0);
-          if (onDoubleClick) {
-            onDoubleClick(e as unknown as React.MouseEvent);
-          }
-        } else {
-          // 单击事件
-          setTapCount(tapCount + 1);
-          setLastTapTime(currentTime);
-          
-          // 如果不是拖拽操作且有点击回调，触发点击事件
-          if (onClick) {
-            onClick(employee.id);
-          }
-          
-          // 重置计数器
-          setTimeout(() => {
-            if (tapCount === 1) {
-              setTapCount(0);
-              setLastTapTime(0);
-            }
-          }, 300);
-        }
+      }
+      
+      // 如果不是拖拽操作且有点击回调，触发点击事件
+      if (!wasDragging && onClick) {
+        onClick(employee.id);
       }
     };
     
     const handleTouchCancel = () => {
+      // 清除触摸开始的定时器
+      if (touchStartTimeoutRef.current) {
+        clearTimeout(touchStartTimeoutRef.current);
+        touchStartTimeoutRef.current = null;
+      }
+      
       if (isDragging) {
         handleDragEnd();
       }
@@ -244,7 +231,14 @@ export function EmployeeCard({
        <div
         ref={cardRef}
         draggable={isDraggable}
-            onDoubleClick={(e) => onDoubleClick && onDoubleClick(e)}
+            onDoubleClick={(e) => {
+              // 确保清除任何可能存在的定时器，防止双击后触发拖拽
+              if (touchStartTimeoutRef.current) {
+                clearTimeout(touchStartTimeoutRef.current);
+                touchStartTimeoutRef.current = null;
+              }
+              onDoubleClick && onDoubleClick(e);
+            }}
             onClick={onClick ? (e) => onClick(employee.id, e) : undefined}
             onTouchEnd={onClick ? (e) => {
               e.stopPropagation();
