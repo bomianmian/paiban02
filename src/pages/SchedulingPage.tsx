@@ -214,12 +214,17 @@ import ClickSpark from '@/components/ClickSpark';
     );
   };
   
-  // 添加员工到工地
+   // 添加员工到工地
   const addEmployeeToWorksite = (worksiteId: string, employeeId: string) => {
     setWorksites(prev => 
       prev.map(worksite => {
-        // 如果是目标工地，添加员工
+        // 如果是目标工地
         if (worksite.id === worksiteId) {
+          // 检查员工是否已存在于该工地，避免重复添加
+          if (worksite.scheduledEmployees.includes(employeeId)) {
+            return worksite;
+          }
+          // 添加员工
           return { 
             ...worksite, 
             scheduledEmployees: [...worksite.scheduledEmployees, employeeId] 

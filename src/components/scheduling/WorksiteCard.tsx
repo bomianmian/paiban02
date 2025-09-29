@@ -84,9 +84,10 @@ export function WorksiteCard(
       employeeId = (e as CustomEvent).detail.employeeId;
     }
 
-        if (employeeId && !worksite.scheduledEmployees.includes(employeeId)) {
-      onAddEmployee(worksite.id, employeeId);
-    }
+         // 只在员工未被分配到当前工地时添加
+        if (employeeId) {
+          onAddEmployee(worksite.id, employeeId);
+        }
   };
 
   // 处理触摸结束事件（用于检测拖放）
