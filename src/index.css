@@ -193,3 +193,11 @@
     display: none !important;
   }
 }
+
+/* 确保加载动画在所有屏幕尺寸下正确居中 */
+.loader-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
